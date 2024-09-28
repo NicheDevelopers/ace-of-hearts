@@ -2,12 +2,16 @@ import { StandardDeck } from 'cards/build/decks/standard';
 import { Card, decks } from 'cards';
 
 export class BlackjackGame {
-    deck: StandardDeck;
-    turn: boolean;
-    playerHand: BlackjackHand;
-    crupierHand: BlackjackHand;
+    deck: StandardDeck = new StandardDeck({ jokers: 0 });
+    playerHand: BlackjackHand = new BlackjackHand(true);
+    crupierHand: BlackjackHand = new BlackjackHand(false);
+    turn: boolean = true;
+    finished: boolean = false;
     constructor() {
-        console.log('Blackjack game started');
+        this.restart();
+    }
+
+    restart() {
         this.deck = new decks.StandardDeck({ jokers: 0 });
         this.deck.shuffleAll();
         this.playerHand = new BlackjackHand(true);
@@ -15,6 +19,7 @@ export class BlackjackGame {
         this.turn = true;
         this.playerHand.draw(this.deck.draw(2));
         this.crupierHand.draw(this.deck.draw(2));
+        this.finished = false;
     }
 
     shuffle() {
@@ -31,18 +36,38 @@ export class BlackjackGame {
 
     getState(): string {
         if (this.turn){
-            if (this.playerHand.score > 21)
-                return GameStates.PLAYER_LOST;
-            if (this.playerHand.countCards() === 5)
+            if (this.playerHand.score > 21) {
+                const aces = this.playerHand.hand.filter((card) => card.rank.abbrn === 'A').length;
+                const minScore = this.playerHand.score - (aces * 10);
+                if (minScore > 21) {
+                    this.finished = true;
+                    return GameStates.PLAYER_LOST;
+                }
+            }
+            if (this.playerHand.countCards() === 5) {
+                this.finished = true;
                 return GameStates.PLAYER_WIN;
+            }
         }
         else {
-            if (this.crupierHand.score > 21)
-                return GameStates.CRUPIER_LOST;
-            if (this.crupierHand.score > this.playerHand.score)
-                return GameStates.CRUPIER_WIN;
-            if (this.crupierHand.score === this.playerHand.score && this.crupierHand.score > 15)
-                return GameStates.DRAW;
+            if (this.crupierHand.score > 21) {
+                const aces = this.crupierHand.hand.filter((card) => card.rank.abbrn === 'A').length;
+                const minScore = this.crupierHand.score - (aces * 10);
+                if (minScore > 21) {
+                    this.finished = true;
+                    return GameStates.CRUPIER_LOST;
+                }
+            }
+            else {
+                if (this.crupierHand.score > this.playerHand.score) {
+                    this.finished = true;
+                    return GameStates.CRUPIER_WIN;
+                }
+                if (this.crupierHand.score === this.playerHand.score && this.crupierHand.score > 15){
+                    this.finished = true;
+                    return GameStates.DRAW;
+                }
+            }
         }
         return GameStates.CONTINUE;
     }
