@@ -1,4 +1,4 @@
-export interface Symbol {
+export interface PaytableEntry {
   textureUrl: string;
   streaks: {
     3: number;
@@ -9,5 +9,5 @@ export interface Symbol {
 }
 
 export interface Paytable {
-  symbols: Symbol[];
+  symbols: PaytableEntry[];
 }
