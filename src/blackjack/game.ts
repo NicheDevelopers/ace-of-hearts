@@ -11,26 +11,26 @@ export class BlackjackGame {
     blackjackStage: PIXI.Container<PIXI.ContainerChild>;
     deck: StandardDeck = new StandardDeck({ jokers: 0 });
     playerHand: BlackjackHand;
-    crupierHand: BlackjackHand;
+    dealerHand: BlackjackHand;
     turn: boolean = true;
     finished: boolean = false;
     constructor(blackjackStage: PIXI.Container<PIXI.ContainerChild>) {
         this.blackjackStage = blackjackStage;
         this.playerHand = new BlackjackHand(true, this.blackjackStage);
-        this.crupierHand = new BlackjackHand(false, this.blackjackStage);
+        this.dealerHand = new BlackjackHand(false, this.blackjackStage);
         this.restart();
     }
 
     restart() {
         this.blackjackStage.removeChild(...this.playerHand.cardsImg);
-        this.blackjackStage.removeChild(...this.crupierHand.cardsImg);
+        this.blackjackStage.removeChild(...this.dealerHand.cardsImg);
         this.deck = new decks.StandardDeck({ jokers: 0 });
         this.deck.shuffleAll();
         this.playerHand = new BlackjackHand(true, this.blackjackStage);
-        this.crupierHand = new BlackjackHand(false, this.blackjackStage);
+        this.dealerHand = new BlackjackHand(false, this.blackjackStage);
         this.turn = true;
         this.playerHand.draw(this.deck.draw(2));
-        this.crupierHand.draw(this.deck.draw(2));
+        this.dealerHand.draw(this.deck.draw(2));
         this.finished = false;
     }
 
@@ -39,14 +39,14 @@ export class BlackjackGame {
     }
 
     changeTurn() {
-        this.crupierHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.crupierHand.hand[0], false)]);
+        this.dealerHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.dealerHand.hand[0], false)]);
         this.turn = !this.turn;
     }
 
     drawCard() {
         (this.turn) ? 
             this.playerHand.draw(this.deck.draw(1)) 
-            : this.crupierHand.draw(this.deck.draw(1));
+            : this.dealerHand.draw(this.deck.draw(1));
     }
 
     getState(): string {
@@ -55,36 +55,36 @@ export class BlackjackGame {
                 const aces = this.playerHand.hand.filter((card) => card.rank.abbrn === 'A').length;
                 const minScore = this.playerHand.score - (aces * 10);
                 if (minScore > 21) {
-                    this.crupierHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.crupierHand.hand[0], false)]);
+                    this.dealerHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.dealerHand.hand[0], false)]);
                     this.finished = true;
                     return GameStates.PLAYER_LOST;
                 }
             }
             if (this.playerHand.countCards() === 5) {
-                this.crupierHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.crupierHand.hand[0], false)]);
+                this.dealerHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.dealerHand.hand[0], false)]);
                 this.finished = true;
                 return GameStates.PLAYER_WIN;
             }
         }
         else {
-            if (this.crupierHand.score > 21) {
-                const aces = this.crupierHand.hand.filter((card) => card.rank.abbrn === 'A').length;
-                const minScore = this.crupierHand.score - (aces * 10);
+            if (this.dealerHand.score > 21) {
+                const aces = this.dealerHand.hand.filter((card) => card.rank.abbrn === 'A').length;
+                const minScore = this.dealerHand.score - (aces * 10);
                 if (minScore > 21) {
                     this.finished = true;
-                    return GameStates.CRUPIER_LOST;
+                    return GameStates.dealer_LOST;
                 }
-                else if (this.crupierHand.countCards() === 5) {
+                else if (this.dealerHand.countCards() === 5) {
                     this.finished = true;
-                    return GameStates.CRUPIER_WIN;
+                    return GameStates.dealer_WIN;
                 }
             }
             else {
-                if (this.crupierHand.score > this.playerHand.score) {
+                if (this.dealerHand.score > this.playerHand.score) {
                     this.finished = true;
-                    return GameStates.CRUPIER_WIN;
+                    return GameStates.dealer_WIN;
                 }
-                if (this.crupierHand.score === this.playerHand.score && this.crupierHand.score > 15){
+                if (this.dealerHand.score === this.playerHand.score && this.dealerHand.score > 15){
                     this.finished = true;
                     return GameStates.DRAW;
                 }
@@ -98,8 +98,8 @@ export enum GameStates {
     CONTINUE = "Game goes on!",
     PLAYER_WIN = "Player win!",
     PLAYER_LOST = "Player lost!",
-    CRUPIER_WIN = "Crupier win!",
-    CRUPIER_LOST = "Crupier lost!",
+    dealer_WIN = "dealer win!",
+    dealer_LOST = "dealer lost!",
     DRAW = "Draw!",
 }
 
@@ -156,7 +156,7 @@ export class BlackjackHand {
             this.cardsImg.push(sprite);
         })
 
-        console.log((this.isPlayer) ? 'Player' : 'Crupier', 'hand', this.hand);
+        console.log((this.isPlayer) ? 'Player' : 'dealer', 'hand', this.hand);
         console.log('Actual score: ', this.score, ' number of cards: ', this.countCards());
     }
 
