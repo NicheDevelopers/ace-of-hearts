@@ -4,12 +4,12 @@ const slotsStage = new PIXI.Container();
 
 console.log(slotsStage.eventMode);
 interface Reel {
-  container: Container,
-  symbols: OurSprite[],
-  position: number,
-  previousPosition: number,
-  blur: BlurFilter,
-};
+  container: Container;
+  symbols: OurSprite[];
+  position: number;
+  previousPosition: number;
+  blur: BlurFilter;
+}
 
 interface Tween {
   object: any;
@@ -38,27 +38,19 @@ import {
   FillGradient,
 } from "pixi.js";
 import app from "../app";
+import pixiPaytable from "./games/pixi";
+import getLines from "./slots-logic";
+import { getLineScore } from "./scoring";
 
-// placeholder for symbols
-type Symbol = number;
-
-const symbolImages = {
-  0: "https://pixijs.com/assets/eggHead.png",
-  1: "https://pixijs.com/assets/flowerTop.png",
-  2: "https://pixijs.com/assets/helmlok.png",
-  3: "https://pixijs.com/assets/skully.png",
-};
-
-const symbolImageUrls = Object.values(symbolImages);
-// Load the textures
-await Assets.load(symbolImageUrls);
+let CURRENT_GAME = pixiPaytable;
 
 const REEL_WIDTH = 200;
 const SYMBOL_SIZE = 180;
 const VISIBLE_ROWS = 4; // Increase this value to show more rows
+const REELS_COUNT = 5;
 
 // Create different slot symbols
-const slotTextures = symbolImageUrls.map(url => Texture.from(url));
+const slotTextures = CURRENT_GAME.getTextures();
 
 // Build the reels
 const reels = [] as Reel[];
@@ -86,9 +78,7 @@ function setupReels() {
     // Build the symbols
     for (let j = 0; j < VISIBLE_ROWS + 1; j++) {
       const symbolId = Math.floor(Math.random() * slotTextures.length);
-      const symbol = new Sprite(
-        slotTextures[symbolId],
-      ) as OurSprite;
+      const symbol = new Sprite(slotTextures[symbolId]) as OurSprite;
 
       symbol.symbolId = symbolId;
 
@@ -136,7 +126,7 @@ function setupReels() {
   const headerText = new Text("Slot Machine", headerStyle);
   headerText.x = Math.round((topHeader.width - headerText.width) / 2);
   headerText.y = Math.round((TOP_HEADER_HEIGHT - headerText.height) / 2);
-  
+
   topHeader.addChild(headerText);
 
   const bottom = new Graphics()
@@ -198,7 +188,7 @@ let endSymbolUrls: string[][] = [];
 // Function to start playing.
 function startPlay() {
   if (running) {
-    console.log('running');
+    console.log("running");
     return;
   }
   running = true;
@@ -208,23 +198,16 @@ function startPlay() {
     const r = reels[i];
     const target = r.position + 10 + i * 2;
     const time = 500 + i * 200;
-    tweenTo(
-      r,
-      "position",
-      target,
-      time,
-      backout(0.05),
-      null,
-      () => {
-        const sortedReel = ([...(r.symbols as OurSprite[])]).sort((a, b) => a.y - b.y);
-        // delete the first element - the one hidden behind the header
-        sortedReel.shift();
+    tweenTo(r, "position", target, time, backout(0.05), null, () => {
+      const sortedReel = [...(r.symbols as OurSprite[])].sort(
+        (a, b) => a.y - b.y,
+      );
+      // delete the first element - the one hidden behind the header
+      sortedReel.shift();
 
-        endSymbolUrls.push((sortedReel.map(s => s.texture.label ?? "unknown")));
-        if (i === reels.length - 1)
-          reelsComplete();
-      },
-    );
+      endSymbolUrls.push(sortedReel.map((s) => s.texture.label ?? "unknown"));
+      if (i === reels.length - 1) reelsComplete();
+    });
   }
 }
 
@@ -233,9 +216,23 @@ function reelsComplete() {
   running = false;
 
   // map to get the string content after the last slash
-  console.log(endSymbolUrls.map(urls => urls.map(url => url.split('/').pop())));
+  console.log(
+    endSymbolUrls.map((urls) => urls.map((url) => url.split("/").pop())),
+  );
 
   endSymbolUrls; // <- tutaj array z url symboli które się wylosowały
+  const lines = getLines(5, 4, 10);
+
+  for (const line of lines) {
+    let symbolsOnLine: string[] = [];
+    for (let i = 0; i < REELS_COUNT; i++) {
+      symbolsOnLine.push(endSymbolUrls[i][line[i]]);
+    }
+    const score = getLineScore(symbolsOnLine, CURRENT_GAME);
+    if (score > 0) {
+      console.log(line, symbolsOnLine, score);
+    }
+  }
 }
 
 // Listen for animate update.

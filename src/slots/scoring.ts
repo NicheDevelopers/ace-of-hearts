@@ -1,33 +1,50 @@
-import { Paytable, Symbol } from "./Paytable";
+import { Paytable, PaytableEntry } from "./Paytable";
 
-export function getLineScore(symbols: Symbol[], paytable: Paytable): number {
-  // Find the longest matching streak of symbols (excluding wilds)
-  let longestStreak = 0;
-  let currentStreak = 1;
-  let currentSymbol = symbols[0];
+export function getLineScore(symbols: string[], paytable: Paytable): number {
+  let maxScore = 0;
 
-  for (let i = 1; i < symbols.length; i++) {
-    if (symbols[i] === currentSymbol && !currentSymbol.isWildcard) {
-      currentStreak++;
-    } else {
-      longestStreak = Math.max(longestStreak, currentStreak);
-      currentStreak = 1;
-      currentSymbol = symbols[i];
+  // Function to calculate score for a specific symbol
+  const calculateScore = (targetSymbol: string) => {
+    let streak = 0;
+    const targetEntry = paytable.getEntryByUrl(targetSymbol);
+
+    for (const symbol of symbols) {
+      const currentEntry = paytable.getEntryByUrl(symbol);
+      if (symbol === targetSymbol || currentEntry.isWildcard) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+
+    if (streak >= 3) {
+      return (
+        targetEntry.streaks[streak as keyof typeof targetEntry.streaks] || 0
+      );
+    }
+    return 0;
+  };
+
+  // Calculate score for each unique non-wildcard symbol
+  const uniqueSymbols = new Set(
+    symbols.filter((symbol) => !paytable.getEntryByUrl(symbol).isWildcard),
+  );
+  for (const symbol of uniqueSymbols) {
+    const score = calculateScore(symbol);
+    if (score > maxScore) {
+      maxScore = score;
     }
   }
-  longestStreak = Math.max(longestStreak, currentStreak);
 
-  // Find the matching symbol in the paytable
-  const matchingSymbol = paytable.symbols.find(
-    (symbol) => symbol === currentSymbol,
-  );
-
-  // Calculate the score based on the streak length and paytable
-  if (matchingSymbol) {
-    return (
-      matchingSymbol.streaks[longestStreak as keyof Symbol["streaks"]] || 0
+  // Handle the case where all symbols are wildcards
+  if (uniqueSymbols.size === 0 && symbols.length > 0) {
+    const wildcardEntry = paytable.getEntryByUrl(symbols[0]);
+    maxScore = Math.max(
+      wildcardEntry.streaks[3],
+      wildcardEntry.streaks[4],
+      wildcardEntry.streaks[5],
     );
   }
 
-  return 0;
+  return maxScore;
 }
