@@ -37,7 +37,7 @@ passButton.on('pointerdown', () => {
         game.drawCard();
         console.log('Game state:', game.getState());
     }
-    console.log('Game state after crupier moves:', game.getState());
+    console.log('Game state after dealer moves:', game.getState());
 });
 
 const restartButton = new PIXI.Graphics();
