@@ -61,6 +61,7 @@ export class BlackjackGame {
                 }
             }
             if (this.playerHand.countCards() === 5) {
+                this.crupierHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.crupierHand.hand[0], false)]);
                 this.finished = true;
                 return GameStates.PLAYER_WIN;
             }
