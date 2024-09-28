@@ -1,10 +1,10 @@
 import * as PIXI from "pixi.js";
-import { BlackjackGame, GameStates } from "./game";
 import app from "../app";
+import { BlackjackGame, GameStates } from "./game";
 
 const blackjackStage = new PIXI.Container();
 
-const game = new BlackjackGame();
+const game = new BlackjackGame(blackjackStage);
 
 const drawButton = new PIXI.Graphics();
 drawButton.fill(0xff0000);
@@ -14,9 +14,11 @@ drawButton.interactive = true;
 drawButton.position.set(100, 100);
 app.stage.addChild(drawButton);
 drawButton.on('pointerdown', () => {
-    if (game.finished) return;
+    if (game.finished) 
+        return;
     game.drawCard();
-    if (game.getState() !== GameStates.CONTINUE) console.log(game.getState());
+    if (game.getState() !== GameStates.CONTINUE) 
+        console.log(game.getState());
 });
 
 const passButton = new PIXI.Graphics();
@@ -27,7 +29,8 @@ passButton.interactive = true;
 passButton.position.set(300, 100);
 app.stage.addChild(passButton);
 passButton.on('pointerdown', () => {
-    if (game.finished) return;
+    if (game.finished) 
+        return;
     console.log('Passing turn');
     game.changeTurn();
     while (game.getState() === GameStates.CONTINUE){

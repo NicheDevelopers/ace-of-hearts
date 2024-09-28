@@ -2,29 +2,32 @@ import { StandardDeck } from 'cards/build/decks/standard';
 import { Card, decks } from 'cards';
 import * as PIXI from 'pixi.js';
 import { parseCardToString } from './parser';
-import blackjackStage from './stage';
 import app from '../app';
 import { CardImages } from './cardImages';
 
 await PIXI.Assets.load(Object.values(CardImages));
 
 export class BlackjackGame {
+    blackjackStage: PIXI.Container<PIXI.ContainerChild>;
     deck: StandardDeck = new StandardDeck({ jokers: 0 });
-    playerHand: BlackjackHand = new BlackjackHand(true);
-    crupierHand: BlackjackHand = new BlackjackHand(false);
+    playerHand: BlackjackHand;
+    crupierHand: BlackjackHand;
     turn: boolean = true;
     finished: boolean = false;
-    constructor() {
+    constructor(blackjackStage: PIXI.Container<PIXI.ContainerChild>) {
+        this.blackjackStage = blackjackStage;
+        this.playerHand = new BlackjackHand(true, this.blackjackStage);
+        this.crupierHand = new BlackjackHand(false, this.blackjackStage);
         this.restart();
     }
 
     restart() {
-        blackjackStage.removeChild(...this.playerHand.cardsImg);
-        blackjackStage.removeChild(...this.crupierHand.cardsImg);
+        this.blackjackStage.removeChild(...this.playerHand.cardsImg);
+        this.blackjackStage.removeChild(...this.crupierHand.cardsImg);
         this.deck = new decks.StandardDeck({ jokers: 0 });
         this.deck.shuffleAll();
-        this.playerHand = new BlackjackHand(true);
-        this.crupierHand = new BlackjackHand(false);
+        this.playerHand = new BlackjackHand(true, this.blackjackStage);
+        this.crupierHand = new BlackjackHand(false, this.blackjackStage);
         this.turn = true;
         this.playerHand.draw(this.deck.draw(2));
         this.crupierHand.draw(this.deck.draw(2));
@@ -36,11 +39,14 @@ export class BlackjackGame {
     }
 
     changeTurn() {
+        this.crupierHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.crupierHand.hand[0], false)]);
         this.turn = !this.turn;
     }
 
     drawCard() {
-        (this.turn) ? this.playerHand.draw(this.deck.draw(1)) : this.crupierHand.draw(this.deck.draw(1));
+        (this.turn) ? 
+            this.playerHand.draw(this.deck.draw(1)) 
+            : this.crupierHand.draw(this.deck.draw(1));
     }
 
     getState(): string {
@@ -49,6 +55,7 @@ export class BlackjackGame {
                 const aces = this.playerHand.hand.filter((card) => card.rank.abbrn === 'A').length;
                 const minScore = this.playerHand.score - (aces * 10);
                 if (minScore > 21) {
+                    this.crupierHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.crupierHand.hand[0], false)]);
                     this.finished = true;
                     return GameStates.PLAYER_LOST;
                 }
@@ -112,12 +119,14 @@ export const CardValues = {
 } as Record<string, number>;
 
 export class BlackjackHand {
+    blackjackStage: PIXI.Container<PIXI.ContainerChild>;
     isPlayer: boolean;
     hand: Card[];
     score: number;
     cardsImg: PIXI.Sprite[];
-    constructor(isPlayer: boolean) {
+    constructor(isPlayer: boolean, blackjackStage: PIXI.Container<PIXI.ContainerChild>) {
         console.log('Blackjack hand started');
+        this.blackjackStage = blackjackStage;
         this.hand = [];
         this.score = 0;
         this.isPlayer = isPlayer;
@@ -128,7 +137,8 @@ export class BlackjackHand {
         cards.map((card) => {
             this.hand.push(card);
             this.score += CardValues[card.rank.abbrn];
-            const sprite = PIXI.Sprite.from(CardImages[parseCardToString(card, false)]);
+            const hidden = (this.isPlayer) ? false : this.countCards() === 1;
+            const sprite = PIXI.Sprite.from(CardImages[parseCardToString(card, hidden)]);
             if (!this.isPlayer) {
                 sprite.x = app.screen.width / 4 + 60 * this.countCards() + Math.random() * 5;
                 sprite.y = app.screen.height / 5;
@@ -141,7 +151,7 @@ export class BlackjackHand {
                 (Math.round(Math.random())) ? 
                     sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
             }
-            app.stage.addChild(sprite);
+            this.blackjackStage.addChild(sprite);
             this.cardsImg.push(sprite);
         })
 
