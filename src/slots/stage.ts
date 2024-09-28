@@ -1,8 +1,29 @@
 import * as PIXI from "pixi.js";
+import slotsBorderPath from "/slots/slots-border.png";
+import slotsHubPath from "/slots/slots-hub.png";
+
+await Assets.load([slotsBorderPath, slotsHubPath]);
 
 const slotsStage = new PIXI.Container();
 
-console.log(slotsStage.eventMode);
+const slotsBorderTexture = PIXI.Texture.from(slotsBorderPath);
+const slotsBorder = new PIXI.Sprite(slotsBorderTexture);
+
+slotsBorder.anchor.set(0);
+slotsBorder.x = 0;
+slotsBorder.y = 0;
+slotsBorder.width = 1920;
+slotsBorder.height = 1080;
+
+const slotsHubTexture = PIXI.Texture.from(slotsHubPath);
+const slotsHub = new PIXI.Sprite(slotsHubTexture);
+
+slotsHub.anchor.set(0, 1);
+slotsHub.x = 0;
+slotsHub.y = 1080;
+slotsHub.width = 1920;
+slotsHub.height = 180;
+
 interface Reel {
   container: Container;
   symbols: OurSprite[];
@@ -39,8 +60,10 @@ import {
 } from "pixi.js";
 import app from "../app";
 import pixiPaytable from "./games/pixi";
+import witcherPaytable from "./games/witcher";
 import getLines, { Line } from "./slots-logic";
 import { getLineScore } from "./scoring";
+import moneyManager from "../MoneyManager";
 
 function getLineGraphics(line: Line) {
   const lineGraphics = new Graphics();
@@ -62,12 +85,13 @@ function getLineGraphics(line: Line) {
   return lineGraphics;
 }
 
-let CURRENT_GAME = pixiPaytable;
+let CURRENT_GAME = witcherPaytable;
 
 const REEL_WIDTH = 200;
 const SYMBOL_SIZE = 180;
 const VISIBLE_ROWS = 4; // Increase this value to show more rows
 const REELS_COUNT = 5;
+const BET_AMOUNT = 25;
 
 // Create different slot symbols
 const slotTextures = CURRENT_GAME.getTextures();
@@ -113,13 +137,15 @@ function setupReels() {
     }
     reels.push(reel);
   }
+  slotsStage.addChild(slotsBorder);
+  // slotsHub is added later to be on the top
   slotsStage.addChild(reelContainer);
 
   // Adjust margins and positioning
   const margin = (app.screen.height - SYMBOL_SIZE * VISIBLE_ROWS) / 2;
 
   reelContainer.y = margin;
-  reelContainer.x = Math.round((app.screen.width - REEL_WIDTH * 5) / 2);
+  reelContainer.x = Math.round((app.screen.width - REEL_WIDTH * 5) / 2 + 10);
 
   // Create top header
   const TOP_HEADER_HEIGHT = SYMBOL_SIZE; // Height of the top header
@@ -151,7 +177,7 @@ function setupReels() {
 
   const bottom = new Graphics()
     .rect(0, SYMBOL_SIZE * VISIBLE_ROWS + margin, app.screen.width, margin)
-    .fill({ color: 0xff0000 });
+    .fill({ color: "#00000000" });
 
   // Create gradient fill
   const fill = new FillGradient(0, 0, 0, 36 * 1.7);
@@ -192,6 +218,7 @@ function setupReels() {
   bottom.addChild(playText);
 
   slotsStage.addChild(topHeader);
+  slotsStage.addChild(slotsHub);
   slotsStage.addChild(bottom);
 
   // Set the interactivity.
@@ -199,6 +226,10 @@ function setupReels() {
   bottom.cursor = "pointer";
   bottom.addListener("pointerdown", () => {
     startPlay();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.code === "Space") startPlay();
   });
 }
 
@@ -214,6 +245,9 @@ function startPlay() {
     return;
   }
   running = true;
+  moneyManager.subtractMoney(BET_AMOUNT);
+  console.log("Betting ", BET_AMOUNT);
+  console.log("Current balance ", moneyManager.formatBalance());
   endSymbolUrls = [];
   highlightedLines.forEach((l) => reelContainer.removeChild(l));
   highlightedLines = [];
@@ -248,6 +282,7 @@ function reelsComplete() {
   const lines = getLines(5, 4, 50);
 
   currentHighlight = 0;
+  let totalScore = 0;
 
   for (const line of lines) {
     let symbolsOnLine: string[] = [];
@@ -255,11 +290,16 @@ function reelsComplete() {
       symbolsOnLine.push(endSymbolUrls[i][line.heights[i]]);
     }
     const score = getLineScore(symbolsOnLine, CURRENT_GAME);
+    totalScore += score;
     if (score > 0) {
       console.log(line, symbolsOnLine, score);
       highlightedLines.push(getLineGraphics(line));
     }
   }
+
+  moneyManager.addMoney(totalScore);
+  console.log("Won ", totalScore);
+  console.log("Current balance: ", moneyManager.formatBalance());
 
   highlightLines();
 }
