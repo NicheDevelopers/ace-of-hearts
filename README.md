@@ -1,2 +1,2 @@
 # ace-of-hearts
-An addictive blend of gambling and romance
+Flirt with croupiuers, bet big, and rise to the top in this Casino Royale simulator!
