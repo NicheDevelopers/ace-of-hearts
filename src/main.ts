@@ -33,7 +33,7 @@ enum Scenes {
   BLACKJACK,
 };
 
-let currentScene = Scenes.BLACKJACK;
+let currentScene = Scenes.SLOTS;
 
 function switchScene() {
   if (currentScene === Scenes.SLOTS) {

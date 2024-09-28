@@ -1,9 +1,10 @@
 import * as PIXI from "pixi.js";
 import { BlackjackGame } from "./game";
+import app from "../app";
 
 const blackjackStage = new PIXI.Container();
 
-let game: any = new BlackjackGame();
+const game = new BlackjackGame();
 
 //const startGameButton = new PIXI.Graphics();
 //startGameButton.on('pointerdown', () => {
@@ -16,8 +17,8 @@ drawButton.rect(0, 0, 100, 50);
 drawButton.fill();
 drawButton.interactive = true;
 drawButton.position.set(100, 100);
-blackjackStage.addChild(drawButton);
-drawButton.on('pointerdown', () => game.drawCard());
+drawButton.on('mousedown', game.drawCard);
+app.stage.addChild(drawButton);
 
 export default blackjackStage;
 

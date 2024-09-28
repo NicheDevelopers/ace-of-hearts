@@ -26,12 +26,14 @@ export class BlackjackGame {
     }
 
     drawCard(): string {
-        if (this.turn)
+        console.log('turn', this.turn);
+        if (this.turn) {
             this.playerHand.draw(this.deck.draw(1));
             if (this.playerHand.score > 21)
                 return 'Player Lost';
             if (this.playerHand.countCards() === 5)
                 return 'Player Win';
+        }
         else {
             if (this.crupierHand.score > this.playerHand.score)
                 return 'Crupier Win';
