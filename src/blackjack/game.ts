@@ -5,7 +5,6 @@ import { parseCardToString } from './parser';
 import blackjackStage from './stage';
 import app from '../app';
 import { CardImages } from './cardImages';
-import { parse } from 'path';
 
 await PIXI.Assets.load(Object.values(CardImages));
 
@@ -20,6 +19,8 @@ export class BlackjackGame {
     }
 
     restart() {
+        blackjackStage.removeChild(...this.playerHand.cardsImg);
+        blackjackStage.removeChild(...this.crupierHand.cardsImg);
         this.deck = new decks.StandardDeck({ jokers: 0 });
         this.deck.shuffleAll();
         this.playerHand = new BlackjackHand(true);
@@ -130,13 +131,13 @@ export class BlackjackHand {
             const sprite = PIXI.Sprite.from(CardImages[parseCardToString(card, false)]);
             if (!this.isPlayer) {
                 sprite.x = app.screen.width / 4 + 60 * this.countCards() + Math.random() * 5;
-                sprite.y = app.screen.height / 4;
+                sprite.y = app.screen.height / 5;
                 (Math.round(Math.random())) ?
                     sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
             }
             else {
                 sprite.x = app.screen.width / 4 + 60 * this.countCards() + Math.random() * 5;
-                sprite.y = app.screen.height / 4 * 3;
+                sprite.y = app.screen.height / 5 * 3;
                 (Math.round(Math.random())) ? 
                     sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
             }
