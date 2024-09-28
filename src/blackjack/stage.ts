@@ -6,15 +6,17 @@ const blackjackStage = new PIXI.Container();
 
 const game = new BlackjackGame(blackjackStage);
 
-import dziadu from '/dziadu.webp';
+import button from '/button.png';
+import button_pressed from '/button_pressed.png';
 await PIXI.Assets.load([
-    dziadu,
+    button,
+    button_pressed,
 ]);
 
 const drawButton = new FancyButton({
-    defaultView: dziadu,
-    hoverView: dziadu,
-    pressedView: dziadu,
+    defaultView: button,
+    hoverView: button_pressed,
+    pressedView: button_pressed,
     text: 'Draw',
     scale: 0.1,
     animations: {
@@ -49,9 +51,9 @@ drawButton.onPress.connect(() => {
 blackjackStage.addChild(drawButton);
 
 const passButton = new FancyButton({
-    defaultView: dziadu,
-    hoverView: dziadu,
-    pressedView: dziadu,
+    defaultView: button,
+    hoverView: button_pressed,
+    pressedView: button_pressed,
     text: 'Pass',
     scale: 0.1,
     animations: {
@@ -90,9 +92,9 @@ passButton.onPress.connect(() => {
 blackjackStage.addChild(passButton);
 
 const restartButton = new FancyButton({
-    defaultView: dziadu,
-    hoverView: dziadu,
-    pressedView: dziadu,
+    defaultView: button,
+    hoverView: button_pressed,
+    pressedView: button_pressed,
     text: 'Restart',
     scale: 0.1,
     animations: {
