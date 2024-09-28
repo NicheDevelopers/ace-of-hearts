@@ -10,8 +10,8 @@ export class BlackjackGame {
         console.log('Blackjack game started');
         this.deck = new decks.StandardDeck({ jokers: 0 });
         this.deck.shuffleAll();
-        this.playerHand = new BlackjackHand();
-        this.crupierHand = new BlackjackHand();
+        this.playerHand = new BlackjackHand(true);
+        this.crupierHand = new BlackjackHand(false);
         this.turn = true;
         this.playerHand.draw(this.deck.draw(2));
         this.crupierHand.draw(this.deck.draw(2));
@@ -25,25 +25,36 @@ export class BlackjackGame {
         this.turn = !this.turn;
     }
 
-    drawCard(): string {
-        console.log('turn', this.turn);
-        if (this.turn) {
-            this.playerHand.draw(this.deck.draw(1));
+    drawCard() {
+        (this.turn) ? this.playerHand.draw(this.deck.draw(1)) : this.crupierHand.draw(this.deck.draw(1));
+    }
+
+    getState(): string {
+        if (this.turn){
             if (this.playerHand.score > 21)
-                return 'Player Lost';
+                return GameStates.PLAYER_LOST;
             if (this.playerHand.countCards() === 5)
-                return 'Player Win';
+                return GameStates.PLAYER_WIN;
         }
         else {
-            if (this.crupierHand.score > this.playerHand.score)
-                return 'Crupier Win';
             if (this.crupierHand.score > 21)
-                return 'Crupier Lost';
-            else
-                this.crupierHand.draw(this.deck.draw(1));
+                return GameStates.CRUPIER_LOST;
+            if (this.crupierHand.score > this.playerHand.score)
+                return GameStates.CRUPIER_WIN;
+            if (this.crupierHand.score === this.playerHand.score && this.crupierHand.score > 15)
+                return GameStates.DRAW;
         }
-        return 'undefined';
+        return GameStates.CONTINUE;
     }
+}
+
+export enum GameStates {
+    CONTINUE = "Game goes on!",
+    PLAYER_WIN = "Player win!",
+    PLAYER_LOST = "Player lost!",
+    CRUPIER_WIN = "Crupier win!",
+    CRUPIER_LOST = "Crupier lost!",
+    DRAW = "Draw!",
 }
 
 export const CardValues = {
@@ -63,18 +74,22 @@ export const CardValues = {
 } as Record<string, number>;
 
 export class BlackjackHand {
+    isPlayer: boolean;
     hand: Card[];
     score: number;
-    constructor() {
+    constructor(isPlayer: boolean) {
         console.log('Blackjack hand started');
         this.hand = [];
         this.score = 0;
+        this.isPlayer = isPlayer;
     }
 
     draw(cards: Card[]){
-        console.log('Drawing cards: ', cards);
         this.hand.push(...cards);
         cards.map((card) => this.score += CardValues[card.rank.abbrn]);
+
+        console.log((this.isPlayer) ? 'Player' : 'Crupier', 'hand', this.hand);
+        console.log('Actual score: ', this.score, ' number of cards: ', this.countCards());
     }
 
     countCards(): number{
