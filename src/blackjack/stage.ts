@@ -1,9 +1,9 @@
-import * as PIXI from 'pixi.js';
-const blackjack = require('blackjack-core');
+import * as PIXI from "pixi.js";
+import * as Blackjack from "engine-blackjack";
 
 const blackjackStage = new PIXI.Container();
-const Game = blackjack.Game;
-const actions = blackjack.actions;
+const Game = Blackjack.Game;
+const actions = Blackjack.actions;
 
 const game = new Game();
 
@@ -11,3 +11,4 @@ console.log(game.getState());
 game.dispatch(actions.deal());
 
 export default blackjackStage;
+
