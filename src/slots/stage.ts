@@ -42,6 +42,20 @@ import pixiPaytable from "./games/pixi";
 import getLines from "./slots-logic";
 import { getLineScore } from "./scoring";
 
+function getLineGraphics(heights: number[]) {
+  const line = new Graphics();
+  line.setStrokeStyle({ width: 15, color: "#FFFFFF" });
+
+  line.moveTo(SYMBOL_SIZE / 2, heights[0] * SYMBOL_SIZE + SYMBOL_SIZE / 2);
+
+  for (let i = 1; i < heights.length; i++) {
+    line.lineTo(i * REEL_WIDTH + SYMBOL_SIZE / 2, heights[i] * SYMBOL_SIZE + SYMBOL_SIZE / 2);
+  }
+  line.stroke();
+
+  return line;
+}
+
 let CURRENT_GAME = pixiPaytable;
 
 const REEL_WIDTH = 200;
@@ -185,6 +199,8 @@ function setupReels() {
 let running = false;
 let endSymbolUrls: string[][] = [];
 
+let highlightedLines: Graphics[] = [];
+
 // Function to start playing.
 function startPlay() {
   if (running) {
@@ -193,6 +209,9 @@ function startPlay() {
   }
   running = true;
   endSymbolUrls = [];
+  highlightedLines.forEach(l => reelContainer.removeChild(l));
+  highlightedLines = [];
+
 
   for (let i = 0; i < reels.length; i++) {
     const r = reels[i];
@@ -221,7 +240,9 @@ function reelsComplete() {
   );
 
   endSymbolUrls; // <- tutaj array z url symboli które się wylosowały
-  const lines = getLines(5, 4, 10);
+  const lines = getLines(5, 4, 50);
+
+  currentHighlight = 0;
 
   for (const line of lines) {
     let symbolsOnLine: string[] = [];
@@ -231,9 +252,29 @@ function reelsComplete() {
     const score = getLineScore(symbolsOnLine, CURRENT_GAME);
     if (score > 0) {
       console.log(line, symbolsOnLine, score);
+      highlightedLines.push(getLineGraphics(line));
     }
   }
+
+  highlightLines();
 }
+
+// index of the currently highlighted line from highlightedLines
+let currentHighlight = 0;
+
+function highlightLines() {
+  if (running || highlightedLines.length === 0) return;
+  
+  const child = highlightedLines[currentHighlight];
+
+  reelContainer.addChild(child);
+
+  setTimeout(() => {
+    reelContainer.removeChild(child);
+    currentHighlight = (currentHighlight + 1) % highlightedLines.length;
+    highlightLines();
+  }, 500);
+};
 
 // Listen for animate update.
 app.ticker.add(() => {
