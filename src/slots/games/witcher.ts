@@ -1,6 +1,6 @@
 import { Paytable, PaytableEntry } from "../Paytable";
 
-const pixiEntries: PaytableEntry[] = [
+const witcherEntries: PaytableEntry[] = [
   {
     isWildcard: false,
     streaks: {
@@ -8,7 +8,7 @@ const pixiEntries: PaytableEntry[] = [
       4: 50,
       5: 100,
     },
-    textureUrl: "/slots/assets/eggHead.png",
+    textureUrl: "http://localhost:3000/slots/witcher-aard.png",
   },
   {
     isWildcard: false,
@@ -17,7 +17,7 @@ const pixiEntries: PaytableEntry[] = [
       4: 10,
       5: 15,
     },
-    textureUrl: "https://pixijs.com/assets/flowerTop.png",
+    textureUrl: "http://localhost:3000/slots/witcher-igni.png",
   },
   {
     isWildcard: false,
@@ -26,7 +26,7 @@ const pixiEntries: PaytableEntry[] = [
       4: 150,
       5: 200,
     },
-    textureUrl: "https://pixijs.com/assets/helmlok.png",
+    textureUrl: "http://localhost:3000/slots/witcher-axii.png",
   },
   {
     isWildcard: false,
@@ -35,12 +35,19 @@ const pixiEntries: PaytableEntry[] = [
       4: 500,
       5: 1000,
     },
-    textureUrl: "https://pixijs.com/assets/skully.png",
+    textureUrl: "http://localhost:3000/slots/witcher-quen.png",
+  },
+  {
+    isWildcard: false,
+    streaks: {
+      3: 250,
+      4: 500,
+      5: 1000,
+    },
+    textureUrl: "http://localhost:3000/slots/witcher-yrden.png",
   },
 ];
-const pixiPaytable = new Paytable(pixiEntries);
-console.log("pixi init");
-await pixiPaytable.init();
-console.log("done pixi init");
+const witcherPaytable = new Paytable(witcherEntries);
+await witcherPaytable.init();
 
-export default pixiPaytable;
+export default witcherPaytable;

@@ -25,6 +25,7 @@ export class Paytable {
     return this.symbols.map((s) => Texture.from(s.textureUrl));
   }
   getEntryByUrl(url: string): PaytableEntry {
+    console.log(url);
     return this.symbols.find((s) => s.textureUrl === url)!;
   }
 }

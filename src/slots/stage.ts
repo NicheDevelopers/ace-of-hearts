@@ -60,6 +60,7 @@ import {
 } from "pixi.js";
 import app from "../app";
 import pixiPaytable from "./games/pixi";
+import witcherPaytable from "./games/witcher";
 import getLines, { Line } from "./slots-logic";
 import { getLineScore } from "./scoring";
 import moneyManager from "../MoneyManager";
@@ -84,7 +85,7 @@ function getLineGraphics(line: Line) {
   return lineGraphics;
 }
 
-let CURRENT_GAME = pixiPaytable;
+let CURRENT_GAME = witcherPaytable;
 
 const REEL_WIDTH = 200;
 const SYMBOL_SIZE = 180;
