@@ -1,33 +1,82 @@
 import * as PIXI from "pixi.js";
 import { BlackjackGame, GameStates } from "./game";
+import { FancyButton } from "@pixi/ui";
 
 const blackjackStage = new PIXI.Container();
 
 const game = new BlackjackGame(blackjackStage);
 
-const drawButton = new PIXI.Graphics();
-drawButton.fill(0xff0000);
-drawButton.rect(0, 0, 100, 50);
-drawButton.fill();
-drawButton.interactive = true;
+import dziadu from '/dziadu.webp';
+await PIXI.Assets.load([
+    dziadu,
+]);
+
+const drawButton = new FancyButton({
+    defaultView: dziadu,
+    hoverView: dziadu,
+    pressedView: dziadu,
+    text: 'Draw',
+    scale: 0.1,
+    animations: {
+         hover: {
+             props: {
+                 scale: {
+                     x: 1.1,
+                     y: 1.1,
+                 }
+             },
+             duration: 100,
+         },
+         pressed: {
+             props: {
+                 scale: {
+                     x: 0.9,
+                     y: 0.9,
+                 }
+             },
+             duration: 100,
+         }
+     }
+});
 drawButton.position.set(100, 100);
-blackjackStage.addChild(drawButton);
-drawButton.on('pointerdown', () => {
+drawButton.onPress.connect(() => {
     if (game.finished) 
         return;
     game.drawCard();
     if (game.getState() !== GameStates.CONTINUE) 
         console.log(game.getState());
 });
+blackjackStage.addChild(drawButton);
 
-const passButton = new PIXI.Graphics();
-passButton.fill(0xff0000);
-passButton.rect(0, 0, 100, 50);
-passButton.fill();
-passButton.interactive = true;
+const passButton = new FancyButton({
+    defaultView: dziadu,
+    hoverView: dziadu,
+    pressedView: dziadu,
+    text: 'Pass',
+    scale: 0.1,
+    animations: {
+         hover: {
+             props: {
+                 scale: {
+                     x: 1.1,
+                     y: 1.1,
+                 }
+             },
+             duration: 100,
+         },
+         pressed: {
+             props: {
+                 scale: {
+                     x: 0.9,
+                     y: 0.9,
+                 }
+             },
+             duration: 100,
+         }
+     }
+});
 passButton.position.set(300, 100);
-blackjackStage.addChild(passButton);
-passButton.on('pointerdown', () => {
+passButton.onPress.connect(() => {
     if (game.finished) 
         return;
     console.log('Passing turn');
@@ -38,15 +87,38 @@ passButton.on('pointerdown', () => {
     }
     console.log('Game state after dealer moves:', game.getState());
 });
+blackjackStage.addChild(passButton);
 
-const restartButton = new PIXI.Graphics();
-restartButton.fill(0xff0000);
-restartButton.rect(0, 0, 100, 50);
-restartButton.fill();
-restartButton.interactive = true;
+const restartButton = new FancyButton({
+    defaultView: dziadu,
+    hoverView: dziadu,
+    pressedView: dziadu,
+    text: 'Restart',
+    scale: 0.1,
+    animations: {
+         hover: {
+             props: {
+                 scale: {
+                     x: 1.1,
+                     y: 1.1,
+                 }
+             },
+             duration: 100,
+         },
+         pressed: {
+             props: {
+                 scale: {
+                     x: 0.9,
+                     y: 0.9,
+                 }
+             },
+             duration: 100,
+         }
+     }
+});
 restartButton.position.set(500, 100);
 blackjackStage.addChild(restartButton);
-restartButton.on('pointerdown', () => {
+restartButton.onPress.connect(() => {
     console.log('Restarting game');
     game.restart();
 });
