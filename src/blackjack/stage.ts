@@ -1,5 +1,4 @@
 import * as PIXI from "pixi.js";
-import app from "../app";
 import { BlackjackGame, GameStates } from "./game";
 
 const blackjackStage = new PIXI.Container();
@@ -12,7 +11,7 @@ drawButton.rect(0, 0, 100, 50);
 drawButton.fill();
 drawButton.interactive = true;
 drawButton.position.set(100, 100);
-app.stage.addChild(drawButton);
+blackjackStage.addChild(drawButton);
 drawButton.on('pointerdown', () => {
     if (game.finished) 
         return;
@@ -27,7 +26,7 @@ passButton.rect(0, 0, 100, 50);
 passButton.fill();
 passButton.interactive = true;
 passButton.position.set(300, 100);
-app.stage.addChild(passButton);
+blackjackStage.addChild(passButton);
 passButton.on('pointerdown', () => {
     if (game.finished) 
         return;
@@ -46,7 +45,7 @@ restartButton.rect(0, 0, 100, 50);
 restartButton.fill();
 restartButton.interactive = true;
 restartButton.position.set(500, 100);
-app.stage.addChild(restartButton);
+blackjackStage.addChild(restartButton);
 restartButton.on('pointerdown', () => {
     console.log('Restarting game');
     game.restart();
