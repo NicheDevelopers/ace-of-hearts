@@ -1,8 +1,29 @@
 import * as PIXI from "pixi.js";
+import slotsBorderPath from "/slots/slots-border.png";
+import slotsHubPath from "/slots/slots-hub.png";
+
+await Assets.load([slotsBorderPath, slotsHubPath]);
 
 const slotsStage = new PIXI.Container();
 
-console.log(slotsStage.eventMode);
+const slotsBorderTexture = PIXI.Texture.from(slotsBorderPath);
+const slotsBorder = new PIXI.Sprite(slotsBorderTexture);
+
+slotsBorder.anchor.set(0);
+slotsBorder.x = 0;
+slotsBorder.y = 0;
+slotsBorder.width = 1920;
+slotsBorder.height = 1080;
+
+const slotsHubTexture = PIXI.Texture.from(slotsHubPath);
+const slotsHub = new PIXI.Sprite(slotsHubTexture);
+
+slotsHub.anchor.set(0, 1);
+slotsHub.x = 0;
+slotsHub.y = 1080;
+slotsHub.width = 1920;
+slotsHub.height = 180;
+
 interface Reel {
   container: Container;
   symbols: OurSprite[];
@@ -115,13 +136,15 @@ function setupReels() {
     }
     reels.push(reel);
   }
+  slotsStage.addChild(slotsBorder);
+  // slotsHub is added later to be on the top
   slotsStage.addChild(reelContainer);
 
   // Adjust margins and positioning
   const margin = (app.screen.height - SYMBOL_SIZE * VISIBLE_ROWS) / 2;
 
   reelContainer.y = margin;
-  reelContainer.x = Math.round((app.screen.width - REEL_WIDTH * 5) / 2);
+  reelContainer.x = Math.round((app.screen.width - REEL_WIDTH * 5) / 2 + 10);
 
   // Create top header
   const TOP_HEADER_HEIGHT = SYMBOL_SIZE; // Height of the top header
@@ -153,7 +176,7 @@ function setupReels() {
 
   const bottom = new Graphics()
     .rect(0, SYMBOL_SIZE * VISIBLE_ROWS + margin, app.screen.width, margin)
-    .fill({ color: 0xff0000 });
+    .fill({ color: "#00000000" });
 
   // Create gradient fill
   const fill = new FillGradient(0, 0, 0, 36 * 1.7);
@@ -194,6 +217,7 @@ function setupReels() {
   bottom.addChild(playText);
 
   slotsStage.addChild(topHeader);
+  slotsStage.addChild(slotsHub);
   slotsStage.addChild(bottom);
 
   // Set the interactivity.
@@ -201,6 +225,10 @@ function setupReels() {
   bottom.cursor = "pointer";
   bottom.addListener("pointerdown", () => {
     startPlay();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.code === "Space") startPlay();
   });
 }
 
