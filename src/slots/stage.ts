@@ -1,6 +1,6 @@
 import * as PIXI from "pixi.js";
 import slotsBorderPath from "/slots/slots-border.png";
-import slotsHubPath from "/slots/slots-hub.png";
+import slotsHubPath from "/slots/slots-hub-labeled.png";
 
 await Assets.load([slotsBorderPath, slotsHubPath]);
 
@@ -228,7 +228,7 @@ function setupReels() {
     startPlay();
   });
 
-  document.addEventListener('keydown', (event) => {
+  document.addEventListener("keydown", (event) => {
     if (event.code === "Space") startPlay();
   });
 }
