@@ -54,7 +54,7 @@ export class BlackjackGame {
         const startY = sprite.y;
         sprite.zIndex = -1;
         const downCardStart = () => {
-            sprite.y += 1;
+            sprite.y += 2;
             if (sprite.y >= startY)
                 removeDownCard();
         }
@@ -62,16 +62,16 @@ export class BlackjackGame {
             app.ticker.remove(downCardStart);
         }
         const upCardStart = () => {
-            sprite.y -= 1;
+            sprite.y -= 2;
             if (sprite.y <= startY - 40)
                 removeUpCard();
         }
         const removeUpCard = async () => {
             app.ticker.remove(upCardStart);
             sprite.texture = PIXI.Texture.from(CardImages[parseCardToString(this.dealerHand.hand[0], false)]);
-            await new Promise((resolve) => {
-                setTimeout(resolve, 500);
-            })
+            //await new Promise((resolve) => {
+            //    setTimeout(resolve, 500);
+            //})
             app.ticker.add(downCardStart);
         }
         app.ticker.add(upCardStart);
@@ -168,19 +168,18 @@ export class BlackjackHand {
             this.score += CardValues[card.rank.abbrn];
             const hidden = (this.isPlayer) ? false : this.countCards() === 1;
             const sprite = PIXI.Sprite.from(CardImages[parseCardToString(card, hidden)]);
-            if (!this.isPlayer) {
-                sprite.x = app.screen.width / 1.75 + 60 * this.countCards() + Math.random() * 5;
-                sprite.y = app.screen.height / 4 + 100;
-                (Math.round(Math.random())) ?
+            sprite.scale = 0.85;
+            (Math.round(Math.random())) ? 
                     sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
-                sprite.scale = 0.85;
+            const offsetX = 60 * this.countCards() + Math.random() * 5;
+            const offsetY = 100;
+            if (!this.isPlayer) {
+                sprite.x = app.screen.width / 1.75 + offsetX;
+                sprite.y = app.screen.height / 4 + offsetY;
             }
             else {
-                sprite.x = app.screen.width / 1.75 + 60 * this.countCards() + Math.random() * 5;
-                sprite.y = app.screen.height / 1.4 + 100;
-                (Math.round(Math.random())) ? 
-                    sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
-                sprite.scale = 0.85;
+                sprite.x = app.screen.width / 1.75 + offsetX;
+                sprite.y = app.screen.height / 1.4 + offsetY;
             }
             this.blackjackStage.addChild(sprite);
             const fnTicker = () => {
