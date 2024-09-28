@@ -41,6 +41,7 @@ import app from "../app";
 import pixiPaytable from "./games/pixi";
 import getLines, { Line } from "./slots-logic";
 import { getLineScore } from "./scoring";
+import moneyManager from "../MoneyManager";
 
 function getLineGraphics(line: Line) {
   const lineGraphics = new Graphics();
@@ -68,6 +69,7 @@ const REEL_WIDTH = 200;
 const SYMBOL_SIZE = 180;
 const VISIBLE_ROWS = 4; // Increase this value to show more rows
 const REELS_COUNT = 5;
+const BET_AMOUNT = 25;
 
 // Create different slot symbols
 const slotTextures = CURRENT_GAME.getTextures();
@@ -214,6 +216,9 @@ function startPlay() {
     return;
   }
   running = true;
+  moneyManager.subtractMoney(BET_AMOUNT);
+  console.log("Betting ", BET_AMOUNT);
+  console.log("Current balance ", moneyManager.formatBalance());
   endSymbolUrls = [];
   highlightedLines.forEach((l) => reelContainer.removeChild(l));
   highlightedLines = [];
@@ -248,6 +253,7 @@ function reelsComplete() {
   const lines = getLines(5, 4, 50);
 
   currentHighlight = 0;
+  let totalScore = 0;
 
   for (const line of lines) {
     let symbolsOnLine: string[] = [];
@@ -255,11 +261,16 @@ function reelsComplete() {
       symbolsOnLine.push(endSymbolUrls[i][line.heights[i]]);
     }
     const score = getLineScore(symbolsOnLine, CURRENT_GAME);
+    totalScore += score;
     if (score > 0) {
       console.log(line, symbolsOnLine, score);
       highlightedLines.push(getLineGraphics(line));
     }
   }
+
+  moneyManager.addMoney(totalScore);
+  console.log("Won ", totalScore);
+  console.log("Current balance: ", moneyManager.formatBalance());
 
   highlightLines();
 }
