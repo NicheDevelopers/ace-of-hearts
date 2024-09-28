@@ -15,18 +15,18 @@ await PIXI.Assets.load([
 ]);
 
 // take sprite from public folder
-const sprite = PIXI.Sprite.from(dziadu);
-sprite.anchor.set(0.5);
-sprite.x = app.screen.width / 2;
-sprite.y = app.screen.height / 2;
+//const sprite = PIXI.Sprite.from(dziadu);
+//sprite.anchor.set(0.5);
+//sprite.x = app.screen.width / 2;
+//sprite.y = app.screen.height / 2;
 
 // add the sprite to the stage
-blackjackStage.addChild(sprite);
+//blackjackStage.addChild(sprite);
 
 // animate rotation of the sprite
-app.ticker.add(() => {
-  sprite.rotation += 0.01;
-});
+//app.ticker.add(() => {
+//  sprite.rotation += 0.01;
+//});
 
 enum Scenes {
   SLOTS,

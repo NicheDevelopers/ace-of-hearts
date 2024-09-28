@@ -3,8 +3,11 @@ import { Card, decks } from 'cards';
 import * as PIXI from 'pixi.js';
 import { parseCardToString } from './parser';
 import blackjackStage from './stage';
+import app from '../app';
+import { CardImages } from './cardImages';
+import { parse } from 'path';
 
-await PIXI.Assets.load('../../public/blackjack-assets');
+await PIXI.Assets.load(Object.values(CardImages));
 
 export class BlackjackGame {
     deck: StandardDeck = new StandardDeck({ jokers: 0 });
@@ -23,19 +26,7 @@ export class BlackjackGame {
         this.crupierHand = new BlackjackHand(false);
         this.turn = true;
         this.playerHand.draw(this.deck.draw(2));
-        for (const card of this.playerHand.hand) {
-            const sprite = PIXI.Sprite.from(parseCardToString(card, false));
-            sprite.anchor.set(0.5, 0.5);
-            blackjackStage.addChild(sprite);
-            this.playerHand.cardsImg.push(sprite);
-        }
         this.crupierHand.draw(this.deck.draw(2));
-        for (const card of this.crupierHand.hand) {
-            const sprite = PIXI.Sprite.from(parseCardToString(card, false));
-            sprite.anchor.set(0.75, 0.5)
-            blackjackStage.addChild(sprite);
-            this.crupierHand.cardsImg.push(sprite);
-        }
         this.finished = false;
     }
 
@@ -133,9 +124,16 @@ export class BlackjackHand {
 
         cards.map((card) => {
             this.score += CardValues[card.rank.abbrn];
-            const sprite = PIXI.Sprite.from(parseCardToString(card, false));
-            (this.isPlayer) ? sprite.anchor.set(0.5, 0.5) : sprite.anchor.set(0.75, 0.5);
-            blackjackStage.addChild(sprite);
+            const sprite = PIXI.Sprite.from(CardImages[parseCardToString(card, false)]);
+            if (this.isPlayer) {
+                sprite.x = app.screen.width / 4 + 30 * this.countCards();
+                sprite.y = app.screen.height / 4;
+            }
+            else {
+                sprite.x = app.screen.width / 4 + 30 * this.countCards();
+                sprite.y = app.screen.height / 4 * 3;
+            }
+            app.stage.addChild(sprite);
             this.cardsImg.push(sprite);
         })
 
