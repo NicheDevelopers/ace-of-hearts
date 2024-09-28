@@ -17,9 +17,10 @@ export class Paytable {
     this.symbols = symbols;
   }
   async init() {
-    for (const entry of this.symbols) {
-      await Assets.load(entry.textureUrl);
-    }
+    const promises = this.symbols.map(
+      async (s) => await Assets.load(s.textureUrl),
+    );
+    await Promise.all(promises);
   }
   getTextures() {
     return this.symbols.map((s) => Texture.from(s.textureUrl));
