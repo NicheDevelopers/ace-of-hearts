@@ -41,7 +41,8 @@ const drawButton = new FancyButton({
      }
 });
 drawButton.position.set(100, 100);
-drawButton.onPress.connect(() => {
+app.stage.addChild(drawButton);
+drawButton.on('pointerdown', () => {
     if (game.finished) 
         return;
     game.drawCard();
@@ -78,7 +79,8 @@ const passButton = new FancyButton({
      }
 });
 passButton.position.set(300, 100);
-passButton.onPress.connect(() => {
+app.stage.addChild(passButton);
+passButton.on('pointerdown', () => {
     if (game.finished) 
         return;
     console.log('Passing turn');
@@ -119,8 +121,8 @@ const restartButton = new FancyButton({
      }
 });
 restartButton.position.set(500, 100);
-blackjackStage.addChild(restartButton);
-restartButton.onPress.connect(() => {
+app.stage.addChild(restartButton);
+restartButton.on('pointerdown', () => {
     console.log('Restarting game');
     game.restart();
 });
