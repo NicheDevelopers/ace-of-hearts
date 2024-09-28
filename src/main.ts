@@ -3,12 +3,13 @@ import dziadu from '/dziadu.webp';
 
 import * as PIXI from 'pixi.js';
 import app from './app';
-import Button from './Button';
 
 import './slots/slots-logic.ts';
 
 import slotsStage from './slots/stage.ts';
 import blackjackStage from './blackjack/stage.ts';
+
+import './MoneyManager';
 
 await PIXI.Assets.load([
   dziadu,
