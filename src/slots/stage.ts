@@ -2,6 +2,26 @@ import * as PIXI from "pixi.js";
 
 const slotsStage = new PIXI.Container();
 
+interface Reel {
+  container: Container,
+  symbols: Sprite[],
+  position: number,
+  previousPosition: number,
+  blur: BlurFilter,
+};
+
+interface Tween {
+  object: any,
+  property: any,
+  propertyBeginValue: any,
+  target: any,
+  easing: any,
+  time: any,
+  change: any,
+  complete: any,
+  start: any,
+};
+
 import {
   Assets,
   Color,
@@ -37,7 +57,7 @@ const slotTextures = [
 ];
 
 // Build the reels
-const reels = [];
+const reels = [] as Reel[];
 const reelContainer = new Container();
 
 function setupReels() {
@@ -53,7 +73,7 @@ function setupReels() {
       position: 0,
       previousPosition: 0,
       blur: new BlurFilter(),
-    };
+    } as Reel;
 
     reel.blur.blurX = 0;
     reel.blur.blurY = 0;
@@ -222,7 +242,7 @@ app.ticker.add(() => {
 });
 
 // Very simple tweening utility function. This should be replaced with a proper tweening library in a real product.
-const tweening = [];
+const tweening = [] as Tween[];
 
 function tweenTo(object, property, target, time, easing, onchange, oncomplete) {
   const tween = {
@@ -235,7 +255,7 @@ function tweenTo(object, property, target, time, easing, onchange, oncomplete) {
     change: onchange,
     complete: oncomplete,
     start: Date.now(),
-  };
+  } as Tween;
 
   tweening.push(tween);
 
@@ -245,7 +265,7 @@ function tweenTo(object, property, target, time, easing, onchange, oncomplete) {
 // Listen for animate update.
 app.ticker.add(() => {
   const now = Date.now();
-  const remove = [];
+  const remove = [] as Tween[];
 
   for (let i = 0; i < tweening.length; i++) {
     const t = tweening[i];
