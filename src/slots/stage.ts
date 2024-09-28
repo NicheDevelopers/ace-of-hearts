@@ -4,6 +4,30 @@ import slotsHubPath from "/slots/slots-hub-labeled.png";
 import backgroundPath from "/slots/bigwin-background.png";
 
 await Assets.load([slotsBorderPath, slotsHubPath, backgroundPath]);
+import button from "/button.png";
+import button_pressed from "/button_pressed.png";
+await PIXI.Assets.load([button, button_pressed]);
+
+const buttonAnimation = {
+  hover: {
+    props: {
+      scale: {
+        x: 1.1,
+        y: 1.1,
+      },
+    },
+    duration: 100,
+  },
+  pressed: {
+    props: {
+      scale: {
+        x: 0.9,
+        y: 0.9,
+      },
+    },
+    duration: 100,
+  },
+};
 
 const slotsStage = new PIXI.Container();
 
@@ -65,6 +89,7 @@ import witcherPaytable from "./games/witcher";
 import getLines, { Line } from "./slots-logic";
 import { getLineScore } from "./scoring";
 import moneyManager from "../MoneyManager";
+import { FancyButton } from "@pixi/ui";
 
 function getLineGraphics(line: Line) {
   const lineGraphics = new Graphics();
@@ -180,6 +205,23 @@ function setupReels() {
     .rect(0, SYMBOL_SIZE * VISIBLE_ROWS + margin, app.screen.width, margin)
     .fill({ color: "#00000000" });
 
+  const restartButton = new FancyButton({
+    defaultView: button,
+    pressedView: button_pressed,
+    text: "SPIN",
+    defaultTextScale: 3,
+    scale: 0.5,
+    animations: buttonAnimation,
+  });
+  restartButton.textView!.style.fill = { color: "#ffffff" };
+  restartButton.anchor.set(0.5);
+  restartButton.onPress.connect(() => startPlay());
+  restartButton.x = 1700;
+  restartButton.y = 980;
+  restartButton.zIndex = 99;
+
+  bottom.addChild(restartButton);
+
   // Create gradient fill
   const fill = new FillGradient(0, 0, 0, 36 * 1.7);
 
@@ -193,41 +235,9 @@ function setupReels() {
     fill.addColorStop(ratio, number);
   });
 
-  // Add play text
-  const style = new TextStyle({
-    fontFamily: "Arial",
-    fontSize: 36,
-    fontStyle: "italic",
-    fontWeight: "bold",
-    fill: { fill },
-    stroke: { color: 0x4a1850, width: 5 },
-    dropShadow: {
-      color: 0x000000,
-      angle: Math.PI / 6,
-      blur: 4,
-      distance: 6,
-    },
-    wordWrap: true,
-    wordWrapWidth: 2040,
-  });
-
-  const playText = new Text("Spin the wheels!", style);
-
-  playText.x = Math.round((bottom.width - playText.width) / 2);
-  playText.y =
-    app.screen.height - margin + Math.round((margin - playText.height) / 2);
-  bottom.addChild(playText);
-
   slotsStage.addChild(topHeader);
   slotsStage.addChild(slotsHub);
   slotsStage.addChild(bottom);
-
-  // Set the interactivity.
-  bottom.eventMode = "static";
-  bottom.cursor = "pointer";
-  bottom.addListener("pointerdown", () => {
-    startPlay();
-  });
 
   document.addEventListener("keydown", (event) => {
     if (event.code === "Space") startPlay();
@@ -245,6 +255,7 @@ function startPlay() {
     console.log("running");
     return;
   }
+  console.log("START PLAY");
   running = true;
   moneyManager.subtractMoney(BET_AMOUNT);
   console.log("Betting ", BET_AMOUNT);
@@ -304,8 +315,7 @@ function reelsComplete() {
 
   highlightLines();
 
-  if (totalScore > 1000)
-    bigWin(totalScore);
+  if (totalScore > 1000) bigWin(totalScore);
 }
 
 // index of the currently highlighted line from highlightedLines
@@ -478,24 +488,30 @@ function bigWin(winAmount: number) {
   slotsStage.addChild(bigWinAmount);
 
   const increaseAmount = () => {
-    const timePassedPercent = (new Date().valueOf() - startTime) / (animDuration - 1500);
-    const incrementedValue = Math.round(startAmount + (winAmount - startAmount) * timePassedPercent ** 0.1);
+    const timePassedPercent =
+      (new Date().valueOf() - startTime) / (animDuration - 1500);
+    const incrementedValue = Math.round(
+      startAmount + (winAmount - startAmount) * timePassedPercent ** 0.1,
+    );
 
-    bigWinAmount.text = String(Math.min(incrementedValue, winAmount))
-  }
+    bigWinAmount.text = String(Math.min(incrementedValue, winAmount));
+  };
 
   const pulsateBigWinSize = () => {
     const timePassed = new Date().valueOf() - startTime;
     const scaleMultiplier = 0.3;
     const scale = (timePassed % 500) * scaleMultiplier;
-    const scaleChange = ((timePassed / 500 | 0) % 2 === 0) ? (scale / 500) : (scaleMultiplier - scale / 500);
+    const scaleChange =
+      ((timePassed / 500) | 0) % 2 === 0
+        ? scale / 500
+        : scaleMultiplier - scale / 500;
     background.scale = 1 + scaleChange;
     bigWinText.scale = 1.4 + scaleChange * 1.4;
     bigWinText.y = bigWinY - scaleChange * 60;
 
     bigWinAmount.scale = 1 + scaleChange;
     bigWinAmount.y = bigWinAmountY + scaleChange * 80;
-  }
+  };
 
   app.ticker.add(pulsateBigWinSize);
 
