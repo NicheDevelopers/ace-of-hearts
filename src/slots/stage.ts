@@ -1,8 +1,9 @@
 import * as PIXI from "pixi.js";
 import slotsBorderPath from "/slots/slots-border.png";
 import slotsHubPath from "/slots/slots-hub-labeled.png";
+import backgroundPath from "/slots/bigwin-background.png";
 
-await Assets.load([slotsBorderPath, slotsHubPath]);
+await Assets.load([slotsBorderPath, slotsHubPath, backgroundPath]);
 
 const slotsStage = new PIXI.Container();
 
@@ -240,7 +241,6 @@ let highlightedLines: Graphics[] = [];
 
 // Function to start playing.
 function startPlay() {
-  bigWin(1500);
   if (running) {
     console.log("running");
     return;
@@ -303,6 +303,9 @@ function reelsComplete() {
   console.log("Current balance: ", moneyManager.formatBalance());
 
   highlightLines();
+
+  if (totalScore > 1000)
+    bigWin(totalScore);
 }
 
 // index of the currently highlighted line from highlightedLines
@@ -408,16 +411,16 @@ function backout(amount) {
 }
 
 function bigWin(winAmount: number) {
-  const bgWidth = 700, bgHeight = 440;
-  const background = new Graphics();
+  running = true;
 
-  background.pivot = {
-    x: bgWidth + 800,
-    y: bgHeight + 800,
-  };
-  background.rect(bgWidth + 500, bgHeight + 500, bgWidth, bgHeight)
-  .fill({ color: "#4a0004"});
-  
+  const backgroundTexture = PIXI.Texture.from(backgroundPath);
+  const background = new PIXI.Sprite(backgroundTexture);
+
+  background.anchor.set(0.5);
+  background.x = app.screen.width / 2;
+  background.y = app.screen.height / 2;
+  background.width = 600;
+
   const animDuration = 5500;
 
   const fill = new FillGradient(0, 0, 0, 136 * 1.7);
@@ -435,7 +438,7 @@ function bigWin(winAmount: number) {
   // Add play text
   const style = new TextStyle({
     fontFamily: "Arial",
-    fontSize: 136,
+    fontSize: 166,
     fontWeight: "bold",
     fill: { fill },
     stroke: { color: "#000000", width: 7 },
@@ -451,22 +454,26 @@ function bigWin(winAmount: number) {
 
   const bigWinText = new Text("BIG WIN", style);
 
+  const bigWinY = Math.round(app.screen.height / 2) - 65;
+
   bigWinText.anchor.set(0.5);
   bigWinText.x = Math.round(app.screen.width / 2);
-  bigWinText.y = Math.round(app.screen.height / 2) - 85;
+  bigWinText.y = bigWinY;
+  bigWinText.scale = 1.4;
 
   slotsStage.addChild(background);
   slotsStage.addChild(bigWinText);
 
   const startTime = new Date().valueOf();
-  
-  const startAmount = winAmount-500;
+
+  const startAmount = winAmount - 500;
   const bigWinAmount = new Text(String(startAmount), style);
 
+  const bigWinAmountY = Math.round(app.screen.height / 2) + 85;
   bigWinAmount.anchor.set(0.5);
   bigWinAmount.x = Math.round(app.screen.width / 2);
-  bigWinAmount.y = Math.round(app.screen.height / 2) + 85;
-  bigWinAmount.scale = 0.8;
+  bigWinAmount.y = bigWinAmountY;
+  bigWinAmount.style.fontSize = 110;
 
   slotsStage.addChild(bigWinAmount);
 
@@ -481,10 +488,13 @@ function bigWin(winAmount: number) {
     const timePassed = new Date().valueOf() - startTime;
     const scaleMultiplier = 0.3;
     const scale = (timePassed % 500) * scaleMultiplier;
-    const scaleChange = ((timePassed / 500 | 0) % 2 === 0)? (scale / 500) : (scaleMultiplier - scale / 500);
+    const scaleChange = ((timePassed / 500 | 0) % 2 === 0) ? (scale / 500) : (scaleMultiplier - scale / 500);
     background.scale = 1 + scaleChange;
-    bigWinText.scale = 1 + scaleChange;
-    bigWinAmount.scale = 0.8 + scaleChange;
+    bigWinText.scale = 1.4 + scaleChange * 1.4;
+    bigWinText.y = bigWinY - scaleChange * 60;
+
+    bigWinAmount.scale = 1 + scaleChange;
+    bigWinAmount.y = bigWinAmountY + scaleChange * 80;
   }
 
   app.ticker.add(pulsateBigWinSize);
@@ -497,6 +507,7 @@ function bigWin(winAmount: number) {
     slotsStage.removeChild(bigWinAmount);
     app.ticker.remove(pulsateBigWinSize);
     app.ticker.remove(increaseAmount);
+    running = false;
   }, animDuration);
 }
 
