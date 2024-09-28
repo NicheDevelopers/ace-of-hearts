@@ -3,24 +3,24 @@ import * as PIXI from "pixi.js";
 const slotsStage = new PIXI.Container();
 
 interface Reel {
-  container: Container,
-  symbols: Sprite[],
-  position: number,
-  previousPosition: number,
-  blur: BlurFilter,
-};
+  container: Container;
+  symbols: Sprite[];
+  position: number;
+  previousPosition: number;
+  blur: BlurFilter;
+}
 
 interface Tween {
-  object: any,
-  property: any,
-  propertyBeginValue: any,
-  target: any,
-  easing: any,
-  time: any,
-  change: any,
-  complete: any,
-  start: any,
-};
+  object: any;
+  property: any;
+  propertyBeginValue: any;
+  target: any;
+  easing: any;
+  time: any;
+  change: any;
+  complete: any;
+  start: any;
+}
 
 import {
   Assets,
@@ -193,16 +193,17 @@ function startPlay() {
 
   for (let i = 0; i < reels.length; i++) {
     const r = reels[i];
-    const extra = Math.floor(Math.random() * 3);
-    const target = r.position + 10 + i * 5 + extra;
-    const time = 2500 + i * 600 + extra * 600;
+    // const extra = Math.floor(Math.random() * 3);
+    const extra = 0;
+    const target = r.position + 10 + i * 2 + extra;
+    const time = 500 + i * 200 + extra * 600;
 
     tweenTo(
       r,
       "position",
       target,
       time,
-      backout(0.5),
+      backout(0.05),
       null,
       i === reels.length - 1 ? reelsComplete : null,
     );
