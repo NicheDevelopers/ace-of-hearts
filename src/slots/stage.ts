@@ -240,6 +240,7 @@ let highlightedLines: Graphics[] = [];
 
 // Function to start playing.
 function startPlay() {
+  bigWin(1500);
   if (running) {
     console.log("running");
     return;
@@ -404,6 +405,99 @@ function lerp(a1, a2, t) {
 // https://github.com/CreateJS/TweenJS/blob/master/src/tweenjs/Ease.js
 function backout(amount) {
   return (t) => --t * t * ((amount + 1) * t + amount) + 1;
+}
+
+function bigWin(winAmount: number) {
+  const bgWidth = 700, bgHeight = 440;
+  const background = new Graphics();
+
+  background.pivot = {
+    x: bgWidth + 800,
+    y: bgHeight + 800,
+  };
+  background.rect(bgWidth + 500, bgHeight + 500, bgWidth, bgHeight)
+  .fill({ color: "#4a0004"});
+  
+  const animDuration = 5500;
+
+  const fill = new FillGradient(0, 0, 0, 136 * 1.7);
+
+  const colors = ["#ffffff", "#f2e72d", "#cc2222"].map((color) =>
+    Color.shared.setValue(color).toNumber(),
+  );
+
+  colors.forEach((number, index) => {
+    const ratio = index / colors.length;
+
+    fill.addColorStop(ratio, number);
+  });
+
+  // Add play text
+  const style = new TextStyle({
+    fontFamily: "Arial",
+    fontSize: 136,
+    fontWeight: "bold",
+    fill: { fill },
+    stroke: { color: "#000000", width: 7 },
+    dropShadow: {
+      color: 0x000000,
+      angle: Math.PI / 6,
+      blur: 4,
+      distance: 6,
+    },
+    wordWrap: true,
+    wordWrapWidth: 2040,
+  });
+
+  const bigWinText = new Text("BIG WIN", style);
+
+  bigWinText.anchor.set(0.5);
+  bigWinText.x = Math.round(app.screen.width / 2);
+  bigWinText.y = Math.round(app.screen.height / 2) - 85;
+
+  slotsStage.addChild(background);
+  slotsStage.addChild(bigWinText);
+
+  const startTime = new Date().valueOf();
+  
+  const startAmount = winAmount-500;
+  const bigWinAmount = new Text(String(startAmount), style);
+
+  bigWinAmount.anchor.set(0.5);
+  bigWinAmount.x = Math.round(app.screen.width / 2);
+  bigWinAmount.y = Math.round(app.screen.height / 2) + 85;
+  bigWinAmount.scale = 0.8;
+
+  slotsStage.addChild(bigWinAmount);
+
+  const increaseAmount = () => {
+    const timePassedPercent = (new Date().valueOf() - startTime) / (animDuration - 1500);
+    const incrementedValue = Math.round(startAmount + (winAmount - startAmount) * timePassedPercent ** 0.1);
+
+    bigWinAmount.text = String(Math.min(incrementedValue, winAmount))
+  }
+
+  const pulsateBigWinSize = () => {
+    const timePassed = new Date().valueOf() - startTime;
+    const scaleMultiplier = 0.3;
+    const scale = (timePassed % 500) * scaleMultiplier;
+    const scaleChange = ((timePassed / 500 | 0) % 2 === 0)? (scale / 500) : (scaleMultiplier - scale / 500);
+    background.scale = 1 + scaleChange;
+    bigWinText.scale = 1 + scaleChange;
+    bigWinAmount.scale = 0.8 + scaleChange;
+  }
+
+  app.ticker.add(pulsateBigWinSize);
+
+  app.ticker.add(increaseAmount);
+
+  setTimeout(() => {
+    slotsStage.removeChild(background);
+    slotsStage.removeChild(bigWinText);
+    slotsStage.removeChild(bigWinAmount);
+    app.ticker.remove(pulsateBigWinSize);
+    app.ticker.remove(increaseAmount);
+  }, animDuration);
 }
 
 setupReels();
