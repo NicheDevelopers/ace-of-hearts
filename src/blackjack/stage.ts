@@ -17,8 +17,8 @@ drawButton.rect(0, 0, 100, 50);
 drawButton.fill();
 drawButton.interactive = true;
 drawButton.position.set(100, 100);
-drawButton.on('mousedown', game.drawCard);
 app.stage.addChild(drawButton);
+drawButton.on('pointerdown', () => game.drawCard());
 
 export default blackjackStage;
 
