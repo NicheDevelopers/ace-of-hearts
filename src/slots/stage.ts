@@ -39,21 +39,27 @@ import {
 } from "pixi.js";
 import app from "../app";
 import pixiPaytable from "./games/pixi";
-import getLines from "./slots-logic";
+import getLines, { Line } from "./slots-logic";
 import { getLineScore } from "./scoring";
 
-function getLineGraphics(heights: number[]) {
-  const line = new Graphics();
-  line.setStrokeStyle({ width: 15, color: "#FFFFFF" });
+function getLineGraphics(line: Line) {
+  const lineGraphics = new Graphics();
+  lineGraphics.setStrokeStyle({ width: 15, color: line.color });
 
-  line.moveTo(SYMBOL_SIZE / 2, heights[0] * SYMBOL_SIZE + SYMBOL_SIZE / 2);
+  lineGraphics.moveTo(
+    SYMBOL_SIZE / 2,
+    line.heights[0] * SYMBOL_SIZE + SYMBOL_SIZE / 2,
+  );
 
-  for (let i = 1; i < heights.length; i++) {
-    line.lineTo(i * REEL_WIDTH + SYMBOL_SIZE / 2, heights[i] * SYMBOL_SIZE + SYMBOL_SIZE / 2);
+  for (let i = 1; i < line.heights.length; i++) {
+    lineGraphics.lineTo(
+      i * REEL_WIDTH + SYMBOL_SIZE / 2,
+      line.heights[i] * SYMBOL_SIZE + SYMBOL_SIZE / 2,
+    );
   }
-  line.stroke();
+  lineGraphics.stroke();
 
-  return line;
+  return lineGraphics;
 }
 
 let CURRENT_GAME = pixiPaytable;
@@ -209,9 +215,8 @@ function startPlay() {
   }
   running = true;
   endSymbolUrls = [];
-  highlightedLines.forEach(l => reelContainer.removeChild(l));
+  highlightedLines.forEach((l) => reelContainer.removeChild(l));
   highlightedLines = [];
-
 
   for (let i = 0; i < reels.length; i++) {
     const r = reels[i];
@@ -247,7 +252,7 @@ function reelsComplete() {
   for (const line of lines) {
     let symbolsOnLine: string[] = [];
     for (let i = 0; i < REELS_COUNT; i++) {
-      symbolsOnLine.push(endSymbolUrls[i][line[i]]);
+      symbolsOnLine.push(endSymbolUrls[i][line.heights[i]]);
     }
     const score = getLineScore(symbolsOnLine, CURRENT_GAME);
     if (score > 0) {
@@ -264,7 +269,7 @@ let currentHighlight = 0;
 
 function highlightLines() {
   if (running || highlightedLines.length === 0) return;
-  
+
   const child = highlightedLines[currentHighlight];
 
   reelContainer.addChild(child);
@@ -274,7 +279,7 @@ function highlightLines() {
     currentHighlight = (currentHighlight + 1) % highlightedLines.length;
     highlightLines();
   }, 500);
-};
+}
 
 // Listen for animate update.
 app.ticker.add(() => {

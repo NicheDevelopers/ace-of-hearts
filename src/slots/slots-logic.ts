@@ -1,3 +1,5 @@
+import lineColors from "./lineColors";
+
 const generateLines = (width: number, height: number) =>
   Array(height)
     .fill(0)
@@ -62,12 +64,48 @@ function lineScore(l: number[], height: number): number {
   return longestStreakPoints + secondLongestStreakPoints + symmetricalPoints;
 }
 
+export interface Line {
+  heights: number[];
+  color: string;
+}
+
+const MAX_LINES = 50;
+
 export default function getLines(
   width: number,
   height: number,
   howManyLines: number,
-) {
-  return generateLines(width, height)
+): Line[] {
+  if (howManyLines > MAX_LINES) {
+    throw "Max number of lines exceeded";
+  }
+  const lineHeights = generateLines(width, height)
     .sort((a, b) => lineScore(b, height) - lineScore(a, height))
     .slice(0, howManyLines);
+
+  let lines = [] as Line[];
+  for (let i = 0; i < 50; i++) {
+    if (i < 10) {
+      lines[i] = { heights: lineHeights[i], color: lineColors[10] };
+      continue;
+    }
+    if (i < 20) {
+      lines[i] = { heights: lineHeights[i], color: lineColors[20] };
+      continue;
+    }
+    if (i < 30) {
+      lines[i] = { heights: lineHeights[i], color: lineColors[30] };
+      continue;
+    }
+    if (i < 40) {
+      lines[i] = { heights: lineHeights[i], color: lineColors[40] };
+      continue;
+    }
+    if (i < 50) {
+      lines[i] = { heights: lineHeights[i], color: lineColors[50] };
+      continue;
+    }
+  }
+
+  return lines;
 }
