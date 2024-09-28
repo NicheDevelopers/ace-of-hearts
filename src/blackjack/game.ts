@@ -65,6 +65,10 @@ export class BlackjackGame {
                     this.finished = true;
                     return GameStates.CRUPIER_LOST;
                 }
+                else if (this.crupierHand.countCards() === 5) {
+                    this.finished = true;
+                    return GameStates.CRUPIER_WIN;
+                }
             }
             else {
                 if (this.crupierHand.score > this.playerHand.score) {
@@ -120,18 +124,21 @@ export class BlackjackHand {
     }
 
     draw(cards: Card[]){
-        this.hand.push(...cards);
-
         cards.map((card) => {
+            this.hand.push(card);
             this.score += CardValues[card.rank.abbrn];
             const sprite = PIXI.Sprite.from(CardImages[parseCardToString(card, false)]);
-            if (this.isPlayer) {
-                sprite.x = app.screen.width / 4 + 30 * this.countCards();
+            if (!this.isPlayer) {
+                sprite.x = app.screen.width / 4 + 60 * this.countCards() + Math.random() * 5;
                 sprite.y = app.screen.height / 4;
+                (Math.round(Math.random())) ?
+                    sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
             }
             else {
-                sprite.x = app.screen.width / 4 + 30 * this.countCards();
+                sprite.x = app.screen.width / 4 + 60 * this.countCards() + Math.random() * 5;
                 sprite.y = app.screen.height / 4 * 3;
+                (Math.round(Math.random())) ? 
+                    sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
             }
             app.stage.addChild(sprite);
             this.cardsImg.push(sprite);
