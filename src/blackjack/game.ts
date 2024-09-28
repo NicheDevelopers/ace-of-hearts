@@ -39,7 +39,7 @@ export class BlackjackGame {
     }
 
     changeTurn() {
-        this.dealerHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.dealerHand.hand[0], false)]);
+        this.showDealerHiddenCard();
         this.turn = !this.turn;
     }
 
@@ -49,19 +49,47 @@ export class BlackjackGame {
             : this.dealerHand.draw(this.deck.draw(1));
     }
 
+    showDealerHiddenCard() {
+        const sprite = this.dealerHand.cardsImg[0];
+        const startY = sprite.y;
+        sprite.zIndex = -1;
+        const downCardStart = () => {
+            sprite.y += 1;
+            if (sprite.y >= startY)
+                removeDownCard();
+        }
+        const removeDownCard = () => {
+            app.ticker.remove(downCardStart);
+        }
+        const upCardStart = () => {
+            sprite.y -= 1;
+            if (sprite.y <= startY - 40)
+                removeUpCard();
+        }
+        const removeUpCard = async () => {
+            app.ticker.remove(upCardStart);
+            sprite.texture = PIXI.Texture.from(CardImages[parseCardToString(this.dealerHand.hand[0], false)]);
+            await new Promise((resolve) => {
+                setTimeout(resolve, 500);
+            })
+            app.ticker.add(downCardStart);
+        }
+        app.ticker.add(upCardStart);
+    }
+
     getState(): string {
         if (this.turn){
             if (this.playerHand.score > 21) {
                 const aces = this.playerHand.hand.filter((card) => card.rank.abbrn === 'A').length;
                 const minScore = this.playerHand.score - (aces * 10);
                 if (minScore > 21) {
-                    this.dealerHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.dealerHand.hand[0], false)]);
+                    this.showDealerHiddenCard();
                     this.finished = true;
                     return GameStates.PLAYER_LOST;
                 }
             }
             if (this.playerHand.countCards() === 5) {
-                this.dealerHand.cardsImg[0].texture = PIXI.Texture.from(CardImages[parseCardToString(this.dealerHand.hand[0], false)]);
+                this.showDealerHiddenCard();
                 this.finished = true;
                 return GameStates.PLAYER_WIN;
             }
@@ -141,18 +169,29 @@ export class BlackjackHand {
             const hidden = (this.isPlayer) ? false : this.countCards() === 1;
             const sprite = PIXI.Sprite.from(CardImages[parseCardToString(card, hidden)]);
             if (!this.isPlayer) {
-                sprite.x = app.screen.width / 4 + 60 * this.countCards() + Math.random() * 5;
-                sprite.y = app.screen.height / 5;
+                sprite.x = app.screen.width / 1.75 + 60 * this.countCards() + Math.random() * 5;
+                sprite.y = app.screen.height / 4 + 100;
                 (Math.round(Math.random())) ?
                     sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
+                sprite.scale = 0.85;
             }
             else {
-                sprite.x = app.screen.width / 4 + 60 * this.countCards() + Math.random() * 5;
-                sprite.y = app.screen.height / 5 * 3;
+                sprite.x = app.screen.width / 1.75 + 60 * this.countCards() + Math.random() * 5;
+                sprite.y = app.screen.height / 1.4 + 100;
                 (Math.round(Math.random())) ? 
                     sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
+                sprite.scale = 0.85;
             }
             this.blackjackStage.addChild(sprite);
+            const fnTicker = () => {
+                sprite.y -= 2;
+                if (sprite.y <= ((this.isPlayer) ? app.screen.height / 1.4 : app.screen.height / 4))
+                    removeTicker();
+            }
+            const removeTicker = () => {
+                app.ticker.remove(fnTicker);
+            }
+            app.ticker.add(fnTicker);
             this.cardsImg.push(sprite);
         })
 

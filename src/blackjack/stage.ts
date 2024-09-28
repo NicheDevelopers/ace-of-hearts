@@ -6,6 +6,22 @@ const blackjackStage = new PIXI.Container();
 
 const game = new BlackjackGame(blackjackStage);
 
+import hubPath from "/slots/slots-hub.png";
+
+await PIXI.Assets.load([hubPath]);
+
+const hubTexture = PIXI.Texture.from(hubPath);
+const hub = new PIXI.Sprite(hubTexture);
+
+hub.anchor.set(0, 1);
+hub.x = 0;
+hub.y = 1080;
+hub.width = 1920;
+hub.height = 180;
+hub.zIndex = 1;
+
+blackjackStage.addChild(hub);
+
 import button from '/button.png';
 import button_pressed from '/button_pressed.png';
 await PIXI.Assets.load([
@@ -40,7 +56,7 @@ const drawButton = new FancyButton({
          }
      }
 });
-drawButton.position.set(100, 100);
+drawButton.position.set(1240, 990);
 drawButton.onPress.connect(() => {
     if (game.finished) 
         return;
@@ -48,6 +64,7 @@ drawButton.onPress.connect(() => {
     if (game.getState() !== GameStates.CONTINUE) 
         console.log(game.getState());
 });
+drawButton.zIndex = 2;
 blackjackStage.addChild(drawButton);
 
 const passButton = new FancyButton({
@@ -77,7 +94,7 @@ const passButton = new FancyButton({
          }
      }
 });
-passButton.position.set(300, 100);
+passButton.position.set(1440, 990);
 passButton.onPress.connect(() => {
     if (game.finished) 
         return;
@@ -89,6 +106,7 @@ passButton.onPress.connect(() => {
     }
     console.log('Game state after dealer moves:', game.getState());
 });
+passButton.zIndex = 2;
 blackjackStage.addChild(passButton);
 
 const restartButton = new FancyButton({
@@ -118,12 +136,13 @@ const restartButton = new FancyButton({
          }
      }
 });
-restartButton.position.set(500, 100);
-blackjackStage.addChild(restartButton);
+restartButton.position.set(1640, 990);
 restartButton.onPress.connect(() => {
     console.log('Restarting game');
     game.restart();
 });
+restartButton.zIndex = 2;
+blackjackStage.addChild(restartButton);
 
 export default blackjackStage;
 
