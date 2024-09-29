@@ -61,7 +61,7 @@ export class BlackjackGame {
             : this.dealerHand.draw(this.deck.draw(1));
         const state = this.getState();
         console.log(state);
-        if (state === GameStates.PLAYER_WIN || state === GameStates.dealer_LOST) {
+        if (state === GameStates.PLAYER_WIN || state === GameStates.DEALER_LOST) {
             moneyManager.addMoney(this.currentBet * 2);
         }
         if (state === GameStates.DRAW) {
@@ -120,17 +120,17 @@ export class BlackjackGame {
                 const minScore = this.dealerHand.score - (aces * 10);
                 if (minScore > 21) {
                     this.finished = true;
-                    return GameStates.dealer_LOST;
+                    return GameStates.DEALER_LOST;
                 }
                 else if (this.dealerHand.countCards() === 5) {
                     this.finished = true;
-                    return GameStates.dealer_WIN;
+                    return GameStates.DEALER_WIN;
                 }
             }
             else {
                 if (this.dealerHand.score > this.playerHand.score) {
                     this.finished = true;
-                    return GameStates.dealer_WIN;
+                    return GameStates.DEALER_WIN;
                 }
                 if (this.dealerHand.score === this.playerHand.score && this.dealerHand.score > 15){
                     this.finished = true;
@@ -146,8 +146,8 @@ export enum GameStates {
     CONTINUE = "Game goes on!",
     PLAYER_WIN = "Player win!",
     PLAYER_LOST = "Player lost!",
-    dealer_WIN = "dealer win!",
-    dealer_LOST = "dealer lost!",
+    DEALER_WIN = "dealer win!",
+    DEALER_LOST = "dealer lost!",
     DRAW = "Draw!",
 }
 
