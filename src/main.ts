@@ -10,22 +10,7 @@ import slotsStage from './slots/stage.ts';
 import blackjackStage from './blackjack/stage.ts';
 
 import './MoneyManager';
-
-import OpenAI from 'openai';
-import { OpenAIConfig } from './config.ts';
-
-const client = new OpenAI(OpenAIConfig);
-
-async function main() {
-  const params: OpenAI.Chat.ChatCompletionCreateParams = {
-    messages: [{ role: 'user', content: 'A confident and assertive croupier who takes pride in her card-playing skills. She enjoys games like poker and blackjack, where she can demonstrate her expertise and strategic prowess. Victoria is known for her sharp tongue and competitive nature, often teasing and taunting players to test their mettle at the card table. While she may come across as intimidating, her passion for the game is undeniable, and she seeks worthy opponents to engage in high-stakes card games.' + 'Hi, i would like to play blackjack' }],
-    model: 'gpt-3.5-turbo',
-  };
-  //const chatCompletion: OpenAI.Chat.ChatCompletion = await client.chat.completions.create(params);
-  //console.log(chatCompletion);
-}
-
-await main();
+import { FancyButton } from '@pixi/ui';
 
 await PIXI.Assets.load([
   dziadu,
@@ -66,14 +51,49 @@ function switchScene() {
   console.log('current stage:', currentScene);
 }
 
-const button = new PIXI.Graphics();
-button.fill(0xff0000);
-button.rect(0, 0, 100, 50);
-button.fill();
-button.interactive = true;
-button.position.set(10, 10);
-app.stage.addChild(button);
-// Event listener for the button click
-button.on('pointerdown', switchScene);
+import button from '/button.png';
+import button_pressed from '/button_pressed.png';
+
+await PIXI.Assets.load([
+    button,
+    button_pressed,
+]);
+
+const buttonChangeState = new FancyButton({
+  defaultView: button,
+  hoverView: button_pressed,
+  pressedView: button_pressed,
+  text: 'Change scene',
+  defaultTextScale: 2,
+  scale: 0.3,
+  animations: {
+        hover: {
+            props: {
+                scale: {
+                    x: 1.1,
+                    y: 1.1,
+                }
+            },
+            duration: 100,
+        },
+        pressed: {
+            props: {
+                scale: {
+                    x: 0.9,
+                    y: 0.9,
+                }
+            },
+            duration: 100,
+        }
+    }
+})
+buttonChangeState.anchor.set(1, 0);
+buttonChangeState.position.set(1890, 30);
+buttonChangeState.zIndex = 50;
+buttonChangeState.onPress.connect(() => {
+  switchScene();
+});
+buttonChangeState.textView!.style.fill = 0xffffff;
+app.stage.addChild(buttonChangeState);
 
 switchScene();
