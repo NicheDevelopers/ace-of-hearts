@@ -132,14 +132,16 @@ const winText = new PIXI.Text(`${LAST_WIN}`, {
   fontSize: 60,
   fill: 0xffffff,
 });
-winText.position.set(1350, 960);
+winText.anchor.set(0.5);
+winText.position.set(1365, 995);
 winText.zIndex = 2;
 
 const creditsText = new PIXI.Text(`${moneyManager.getBalance()}`, {
   fontSize: 60,
   fill: 0xffffff,
 });
-creditsText.position.set(590, 960);
+creditsText.anchor.set(0.5);
+creditsText.position.set(632, 995);
 creditsText.zIndex = 2;
 
 function setupReels() {
@@ -240,7 +242,8 @@ function setupReels() {
     fontSize: 60,
     fill: 0xffffff,
   });
-  betText.position.set(1020, 960);
+  betText.anchor.set(0.5);
+  betText.position.set(1055, 995);
   betText.zIndex = 2;
 
   const betPlusButton = new FancyButton({
@@ -287,7 +290,8 @@ function setupReels() {
     fontSize: 60,
     fill: 0xffffff,
   });
-  linesText.position.set(190, 960);
+  linesText.anchor.set(0.5);
+  linesText.position.set(225, 995);
   linesText.zIndex = 2;
 
   const linesPlusButton = new FancyButton({
@@ -364,6 +368,7 @@ function setupReels() {
 }
 
 let running = false;
+let bigWinAnim = false;
 let endSymbolUrls: string[][] = [];
 
 let highlightedLines: Graphics[] = [];
@@ -423,7 +428,7 @@ function reelsComplete() {
       console.log(line, i);
       symbolsOnLine.push(endSymbolUrls[i][line.heights[i]]);
     }
-    const score = getLineScore(symbolsOnLine, CURRENT_GAME);
+    const score = getLineScore(symbolsOnLine, CURRENT_GAME, LINE_COUNT, BET_AMOUNT);
     totalScore += score;
     winText.text = totalScore;
     if (score > 0) {
@@ -447,7 +452,7 @@ function reelsComplete() {
 let currentHighlight = 0;
 
 function highlightLines() {
-  if (running || highlightedLines.length === 0) return;
+  if (running && !bigWinAnim || highlightedLines.length === 0) return;
 
   const child = highlightedLines[currentHighlight];
 
@@ -547,6 +552,7 @@ function backout(amount) {
 
 function bigWin(winAmount: number) {
   running = true;
+  bigWinAnim = true;
 
   const backgroundTexture = PIXI.Texture.from(backgroundPath);
   const background = new PIXI.Sprite(backgroundTexture);
@@ -586,8 +592,10 @@ function bigWin(winAmount: number) {
     wordWrap: true,
     wordWrapWidth: 2040,
   });
+  const text = (winAmount >= 5000) ? "GIGA WIN" :
+  (winAmount >= 2500)? "HUGE WIN" : "BIG WIN";
 
-  const bigWinText = new Text("BIG WIN", style);
+  const bigWinText = new Text(text, style);
 
   const bigWinY = Math.round(app.screen.height / 2) - 65;
 
@@ -649,6 +657,7 @@ function bigWin(winAmount: number) {
     app.ticker.remove(pulsateBigWinSize);
     app.ticker.remove(increaseAmount);
     running = false;
+    bigWinAnim = false;
   }, animDuration);
 }
 
