@@ -56,7 +56,6 @@ export class BlackjackGame {
             this.playerHand.draw(this.deck.draw(1)) 
             : this.dealerHand.draw(this.deck.draw(1));
         const state = this.getState();
-        console.log(state);
         if (state === GameStates.PLAYER_WIN || state === GameStates.DEALER_LOST) {
             moneyManager.addMoney(this.currentBet * 2);
         }
