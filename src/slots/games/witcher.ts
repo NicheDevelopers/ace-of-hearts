@@ -1,53 +1,102 @@
+import { Assets } from "pixi.js";
 import { Paytable, PaytableEntry } from "../Paytable";
+import witcherHorseshoePath from "/slots/witcher-background.png";
 
 const witcherEntries: PaytableEntry[] = [
   {
     isWildcard: false,
     streaks: {
-      3: 25,
-      4: 50,
-      5: 100,
+      3: 1,
+      4: 5,
+      5: 10,
     },
+    rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-aard.png",
   },
   {
     isWildcard: false,
     streaks: {
-      3: 5,
-      4: 10,
-      5: 15,
+      3: 1,
+      4: 5,
+      5: 10,
     },
+    rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-igni.png",
   },
   {
     isWildcard: false,
     streaks: {
-      3: 75,
-      4: 150,
-      5: 200,
+      3: 1,
+      4: 5,
+      5: 10,
     },
+    rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-axii.png",
   },
   {
     isWildcard: false,
     streaks: {
-      3: 250,
-      4: 500,
-      5: 1000,
+      3: 1,
+      4: 5,
+      5: 10,
     },
+    rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-quen.png",
   },
   {
     isWildcard: false,
     streaks: {
-      3: 250,
+      3: 1,
+      4: 5,
+      5: 10,
+    },
+    rarity: 1,
+    textureUrl: "http://localhost:3000/slots/witcher-yrden.png",
+  },
+  {
+    isWildcard: true,
+    streaks: {
+      3: 50,
       4: 500,
       5: 1000,
     },
-    textureUrl: "http://localhost:3000/slots/witcher-yrden.png",
+    rarity: 3,
+    textureUrl: "http://localhost:3000/slots/geralt.png",
+  },
+  {
+    isWildcard: false,
+    streaks: {
+      3: 25,
+      4: 250,
+      5: 500,
+    },
+    rarity: 2,
+    textureUrl: "http://localhost:3000/slots/yennefer.png",
+  },
+  {
+    isWildcard: false,
+    streaks: {
+      3: 25,
+      4: 250,
+      5: 500,
+    },
+    rarity: 2,
+    textureUrl: "http://localhost:3000/slots/zoltan.png",
+  },
+  {
+    isWildcard: false,
+    streaks: {
+      3: 25,
+      4: 250,
+      5: 500,
+    },
+    rarity: 2,
+    textureUrl: "http://localhost:3000/slots/triss.png",
   },
 ];
-const witcherPaytable = new Paytable(witcherEntries);
+
+await Assets.load(witcherHorseshoePath);
+const witcherPaytable = new Paytable(witcherEntries, witcherHorseshoePath);
 await witcherPaytable.init();
 
 export default witcherPaytable;

@@ -2,8 +2,16 @@ import * as PIXI from "pixi.js";
 import slotsBorderPath from "/slots/slots-border.png";
 import slotsHubPath from "/slots/slots-hub-labeled.png";
 import backgroundPath from "/slots/bigwin-background.png";
+import witcherHorseshoePath from "/slots/witcher-background.png";
+import plasterPath from "/slots/wooden-plaster.png";
 
-await Assets.load([slotsBorderPath, slotsHubPath, backgroundPath]);
+await Assets.load([
+  slotsBorderPath,
+  slotsHubPath,
+  backgroundPath,
+  witcherHorseshoePath,
+  plasterPath,
+]);
 import button from "/button.png";
 import button_pressed from "/button_pressed.png";
 await PIXI.Assets.load([button, button_pressed]);
@@ -49,9 +57,27 @@ slotsHub.y = 1080;
 slotsHub.width = 1920;
 slotsHub.height = 180;
 
+// const witcherTexture = PIXI.Texture.from(witcherHorseshoePath);
+// const witcherHorseshoe = new PIXI.Sprite(witcherTexture);
+
+// witcherHorseshoe.anchor.set(0, 0);
+// witcherHorseshoe.x = 0;
+// witcherHorseshoe.y = 0;
+// witcherHorseshoe.width = 1920;
+// witcherHorseshoe.height = 1080;
+
+const plasterTexture = PIXI.Texture.from(plasterPath);
+const plaster = new PIXI.Sprite(plasterTexture);
+
+plaster.anchor.set(0, 0);
+plaster.x = 450;
+plaster.y = 163;
+plaster.width = 1022;
+plaster.height = 17;
+
 interface Reel {
   container: Container;
-  symbols: OurSprite[];
+  symbols: Sprite[];
   position: number;
   previousPosition: number;
   blur: BlurFilter;
@@ -69,8 +95,6 @@ interface Tween {
   start: any;
 }
 
-type OurSprite = Sprite & { symbolId: number };
-
 import {
   Assets,
   Color,
@@ -84,12 +108,13 @@ import {
   FillGradient,
 } from "pixi.js";
 import app from "../app";
-import pixiPaytable from "./games/pixi";
 import witcherPaytable from "./games/witcher";
 import getLines, { Line } from "./slots-logic";
 import { getLineScore } from "./scoring";
 import moneyManager from "../MoneyManager";
 import { FancyButton } from "@pixi/ui";
+import pixiPaytable from "./games/pixi";
+import { hearts } from "cards/build/suits";
 
 function getLineGraphics(line: Line) {
   const lineGraphics = new Graphics();
@@ -111,7 +136,9 @@ function getLineGraphics(line: Line) {
   return lineGraphics;
 }
 
-let CURRENT_GAME = witcherPaytable;
+const GAMES = [witcherPaytable, pixiPaytable];
+let CURRENT_GAME_IDX = 0;
+let CURRENT_GAME = GAMES[CURRENT_GAME_IDX];
 
 const REEL_WIDTH = 200;
 const SYMBOL_SIZE = 180;
@@ -119,15 +146,33 @@ const VISIBLE_ROWS = 4; // Increase this value to show more rows
 const REELS_COUNT = 5;
 let LINE_COUNT = 50;
 let BET_AMOUNT = 25;
-
-// Create different slot symbols
-const slotTextures = CURRENT_GAME.getTextures();
+let LAST_WIN = 0;
 
 // Build the reels
-const reels = [] as Reel[];
-const reelContainer = new Container();
+let reels = [] as Reel[];
+let reelContainer = new Container();
+
+const winText = new PIXI.Text(`${LAST_WIN}`, {
+  fontSize: 60,
+  fill: 0xffffff,
+});
+winText.anchor.set(0.5);
+winText.position.set(1365, 995);
+winText.zIndex = 2;
+
+const creditsText = new PIXI.Text(`${moneyManager.getBalance()}`, {
+  fontSize: 60,
+  fill: 0xffffff,
+});
+creditsText.anchor.set(0.5);
+creditsText.position.set(632, 995);
+creditsText.zIndex = 2;
 
 function setupReels() {
+  reels = [];
+  reelContainer = new Container();
+  slotsStage.removeChildren();
+  reelContainer.removeChildren();
   for (let i = 0; i < 5; i++) {
     const rc = new Container();
 
@@ -148,10 +193,8 @@ function setupReels() {
 
     // Build the symbols
     for (let j = 0; j < VISIBLE_ROWS + 1; j++) {
-      const symbolId = Math.floor(Math.random() * slotTextures.length);
-      const symbol = new Sprite(slotTextures[symbolId]) as OurSprite;
-
-      symbol.symbolId = symbolId;
+      const id = CURRENT_GAME.getRandomTextureIndex();
+      const symbol = new Sprite(slotTextures[id]);
 
       symbol.y = j * SYMBOL_SIZE;
       symbol.scale.x = symbol.scale.y = Math.min(
@@ -167,40 +210,14 @@ function setupReels() {
   slotsStage.addChild(slotsBorder);
   // slotsHub is added later to be on the top
   slotsStage.addChild(reelContainer);
+  slotsStage.addChild(CURRENT_GAME.horseShoeSprite);
+  slotsStage.addChild(plaster);
 
   // Adjust margins and positioning
   const margin = (app.screen.height - SYMBOL_SIZE * VISIBLE_ROWS) / 2;
 
   reelContainer.y = margin;
   reelContainer.x = Math.round((app.screen.width - REEL_WIDTH * 5) / 2 + 10);
-
-  // Create top header
-  const TOP_HEADER_HEIGHT = SYMBOL_SIZE; // Height of the top header
-  const topHeader = new Graphics()
-    .rect(0, 0, app.screen.width, margin)
-    .fill({ color: 0x0000ff }); // Black background
-
-  // Add header text
-  const headerStyle = new TextStyle({
-    fontFamily: "Arial",
-    fontSize: 36,
-    fontStyle: "italic",
-    fontWeight: "bold",
-    fill: 0xffffff, // White text
-    stroke: { color: 0x4a1850, width: 5 },
-    dropShadow: {
-      color: 0x000000,
-      angle: Math.PI / 6,
-      blur: 4,
-      distance: 6,
-    },
-  });
-
-  const headerText = new Text("Slot Machine", headerStyle);
-  headerText.x = Math.round((topHeader.width - headerText.width) / 2);
-  headerText.y = Math.round((TOP_HEADER_HEIGHT - headerText.height) / 2);
-
-  topHeader.addChild(headerText);
 
   const bottom = new Graphics()
     .rect(0, SYMBOL_SIZE * VISIBLE_ROWS + margin, app.screen.width, margin)
@@ -221,6 +238,14 @@ function setupReels() {
   restartButton.y = 980;
   restartButton.zIndex = 99;
 
+  const betText = new PIXI.Text(`${BET_AMOUNT}`, {
+    fontSize: 60,
+    fill: 0xffffff,
+  });
+  betText.anchor.set(0.5);
+  betText.position.set(1055, 995);
+  betText.zIndex = 2;
+
   const betPlusButton = new FancyButton({
     defaultView: button,
     pressedView: button_pressed,
@@ -234,6 +259,7 @@ function setupReels() {
   betPlusButton.onPress.connect(() => {
     if (BET_AMOUNT + 5 > moneyManager.getBalance()) return;
     BET_AMOUNT += 5;
+    betText.text = BET_AMOUNT;
     console.log("New bet amount", BET_AMOUNT);
   });
   betPlusButton.x = 1180;
@@ -253,11 +279,20 @@ function setupReels() {
   betMinusButton.onPress.connect(() => {
     if (BET_AMOUNT <= 5) return;
     BET_AMOUNT -= 5;
+    betText.text = BET_AMOUNT;
     console.log("New bet amount", BET_AMOUNT);
   });
   betMinusButton.x = 930;
   betMinusButton.y = 990;
   betMinusButton.zIndex = 99;
+
+  const linesText = new PIXI.Text(`${LINE_COUNT}`, {
+    fontSize: 60,
+    fill: 0xffffff,
+  });
+  linesText.anchor.set(0.5);
+  linesText.position.set(225, 995);
+  linesText.zIndex = 2;
 
   const linesPlusButton = new FancyButton({
     defaultView: button,
@@ -272,6 +307,7 @@ function setupReels() {
   linesPlusButton.onPress.connect(() => {
     if (LINE_COUNT === 50) return;
     LINE_COUNT += 10;
+    linesText.text = LINE_COUNT;
     console.log("New line count", LINE_COUNT);
   });
   linesPlusButton.x = 340;
@@ -291,11 +327,68 @@ function setupReels() {
   linesMinusButton.onPress.connect(() => {
     if (LINE_COUNT <= 10) return;
     LINE_COUNT -= 10;
+    linesText.text = LINE_COUNT;
     console.log("New line count", LINE_COUNT);
   });
   linesMinusButton.x = 110;
   linesMinusButton.y = 990;
   linesMinusButton.zIndex = 99;
+
+  // Assusmes we switched game idx before calling
+  const switchGame = () => {
+    console.log("next game");
+    console.log(CURRENT_GAME_IDX);
+    CURRENT_GAME = GAMES[CURRENT_GAME_IDX % GAMES.length];
+    console.log(CURRENT_GAME_IDX % GAMES.length);
+    slotTextures = CURRENT_GAME.getTextures();
+    setupReels();
+  };
+
+  const previousGameButton = new FancyButton({
+    defaultView: button,
+    pressedView: button_pressed,
+    text: "Previous Game",
+    defaultTextScale: 1.5,
+    scale: 0.5,
+    animations: buttonAnimation,
+  });
+  previousGameButton.textView!.style.fill = { color: "#ffffff" };
+  previousGameButton.anchor.set(0.5);
+  previousGameButton.onPress.connect(() => {
+    CURRENT_GAME_IDX--;
+    CURRENT_GAME_IDX = Math.abs(CURRENT_GAME_IDX);
+    switchGame();
+  });
+  previousGameButton.x = 100;
+  previousGameButton.y = app.screen.height / 2;
+  previousGameButton.zIndex = 99;
+
+  const nextGameButton = new FancyButton({
+    defaultView: button,
+    pressedView: button_pressed,
+    text: "Next Game",
+    defaultTextScale: 2,
+    scale: 0.5,
+    animations: buttonAnimation,
+  });
+  nextGameButton.textView!.style.fill = { color: "#ffffff" };
+  nextGameButton.anchor.set(0.5);
+  nextGameButton.onPress.connect(() => {
+    CURRENT_GAME_IDX++;
+    CURRENT_GAME_IDX = Math.abs(CURRENT_GAME_IDX);
+    switchGame();
+  });
+  nextGameButton.x = 1920 - 100;
+  nextGameButton.y = app.screen.height / 2;
+  nextGameButton.zIndex = 99;
+
+  bottom.addChild(betText);
+  bottom.addChild(linesText);
+  bottom.addChild(winText);
+  bottom.addChild(creditsText);
+
+  bottom.addChild(previousGameButton);
+  bottom.addChild(nextGameButton);
 
   bottom.addChild(restartButton);
   bottom.addChild(betPlusButton);
@@ -316,7 +409,6 @@ function setupReels() {
     fill.addColorStop(ratio, number);
   });
 
-  slotsStage.addChild(topHeader);
   slotsStage.addChild(slotsHub);
   slotsStage.addChild(bottom);
 
@@ -326,6 +418,7 @@ function setupReels() {
 }
 
 let running = false;
+let bigWinAnim = false;
 let endSymbolUrls: string[][] = [];
 
 let highlightedLines: Graphics[] = [];
@@ -339,6 +432,7 @@ function startPlay() {
   console.log("START PLAY");
   running = true;
   moneyManager.subtractMoney(BET_AMOUNT);
+  creditsText.text = moneyManager.getBalance();
   console.log("Betting ", BET_AMOUNT);
   console.log("Current balance ", moneyManager.formatBalance());
   endSymbolUrls = [];
@@ -350,9 +444,7 @@ function startPlay() {
     const target = r.position + 10 + i * 2;
     const time = 500 + i * 200;
     tweenTo(r, "position", target, time, backout(0.05), null, () => {
-      const sortedReel = [...(r.symbols as OurSprite[])].sort(
-        (a, b) => a.y - b.y,
-      );
+      const sortedReel = [...(r.symbols as Sprite[])].sort((a, b) => a.y - b.y);
       // delete the first element - the one hidden behind the header
       sortedReel.shift();
 
@@ -381,18 +473,24 @@ function reelsComplete() {
   for (const line of lines) {
     let symbolsOnLine: string[] = [];
     for (let i = 0; i < REELS_COUNT; i++) {
-      console.log(line, i);
       symbolsOnLine.push(endSymbolUrls[i][line.heights[i]]);
     }
-    const score = getLineScore(symbolsOnLine, CURRENT_GAME);
+    const score = getLineScore(
+      symbolsOnLine,
+      CURRENT_GAME,
+      LINE_COUNT,
+      BET_AMOUNT,
+    );
     totalScore += score;
+    winText.text = totalScore;
     if (score > 0) {
-      console.log(line, symbolsOnLine, score);
       highlightedLines.push(getLineGraphics(line));
     }
   }
 
+  LAST_WIN = totalScore;
   moneyManager.addMoney(totalScore);
+  creditsText.text = moneyManager.getBalance();
   console.log("Won ", totalScore);
   console.log("Current balance: ", moneyManager.formatBalance());
 
@@ -404,8 +502,10 @@ function reelsComplete() {
 // index of the currently highlighted line from highlightedLines
 let currentHighlight = 0;
 
+let slotTextures = CURRENT_GAME.getTextures();
+
 function highlightLines() {
-  if (running || highlightedLines.length === 0) return;
+  if ((running && !bigWinAnim) || highlightedLines.length === 0) return;
 
   const child = highlightedLines[currentHighlight];
 
@@ -433,8 +533,7 @@ app.ticker.add(() => {
 
       s.y = ((r.position + j) % r.symbols.length) * SYMBOL_SIZE - SYMBOL_SIZE;
       if (s.y < 0 && prevy > SYMBOL_SIZE * (VISIBLE_ROWS - 1)) {
-        s.texture =
-          slotTextures[Math.floor(Math.random() * slotTextures.length)];
+        s.texture = slotTextures[CURRENT_GAME.getRandomTextureIndex()];
         s.scale.x = s.scale.y = Math.min(
           SYMBOL_SIZE / s.texture.width,
           SYMBOL_SIZE / s.texture.height,
@@ -505,6 +604,7 @@ function backout(amount) {
 
 function bigWin(winAmount: number) {
   running = true;
+  bigWinAnim = true;
 
   const backgroundTexture = PIXI.Texture.from(backgroundPath);
   const background = new PIXI.Sprite(backgroundTexture);
@@ -544,8 +644,10 @@ function bigWin(winAmount: number) {
     wordWrap: true,
     wordWrapWidth: 2040,
   });
+  const text =
+    winAmount >= 5000 ? "GIGA WIN" : winAmount >= 2500 ? "HUGE WIN" : "BIG WIN";
 
-  const bigWinText = new Text("BIG WIN", style);
+  const bigWinText = new Text(text, style);
 
   const bigWinY = Math.round(app.screen.height / 2) - 65;
 
@@ -607,6 +709,7 @@ function bigWin(winAmount: number) {
     app.ticker.remove(pulsateBigWinSize);
     app.ticker.remove(increaseAmount);
     running = false;
+    bigWinAnim = false;
   }, animDuration);
 }
 

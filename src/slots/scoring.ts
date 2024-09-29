@@ -1,6 +1,6 @@
 import { Paytable, PaytableEntry } from "./Paytable";
 
-export function getLineScore(symbols: string[], paytable: Paytable): number {
+export function getLineScore(symbols: string[], paytable: Paytable, lineCount: number, bet_amount: number): number {
   let maxScore = 0;
 
   // Function to calculate score for a specific symbol
@@ -18,9 +18,11 @@ export function getLineScore(symbols: string[], paytable: Paytable): number {
     }
 
     if (streak >= 3) {
-      return (
-        targetEntry.streaks[streak as keyof typeof targetEntry.streaks] || 0
-      );
+      const multiplier = bet_amount / lineCount;
+      const win = targetEntry.streaks[streak as keyof typeof targetEntry.streaks] || 0;
+
+      const roundedWin = Math.max(5, Math.floor(win * multiplier / 5) * 5);
+      return roundedWin;
     }
     return 0;
   };
