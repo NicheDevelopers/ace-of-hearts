@@ -18,7 +18,7 @@ export function getLineScore(symbols: string[], paytable: Paytable, lineCount: n
     }
 
     if (streak >= 3) {
-      const multiplier = bet_amount / lineCount;
+      const multiplier = 5 * bet_amount / lineCount;
       const win = targetEntry.streaks[streak as keyof typeof targetEntry.streaks] || 0;
 
       const roundedWin = Math.max(5, Math.floor(win * multiplier / 5) * 5);
