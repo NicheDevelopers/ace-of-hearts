@@ -34,7 +34,18 @@ dealerScoreText.position.set(1870, 300);
 dealerScoreText.zIndex = 2;
 blackjackStage.addChild(dealerScoreText);
 
-const game = new BlackjackGame(blackjackStage, dealerReplay, dealerScoreText, playerScoreText);
+const creditsText = new PIXI.Text(`${moneyManager.getBalance()}`, { fontSize: 60, fill: 0xffffff });
+creditsText.anchor.set(0.5);
+creditsText.position.set(632, 995);
+creditsText.zIndex = 3;
+blackjackStage.addChild(creditsText);
+
+const game = new BlackjackGame(
+    blackjackStage, 
+    dealerReplay, 
+    dealerScoreText, 
+    playerScoreText
+);
 
 import hubPath from "/blackjack/blackjack-hub-labeled.png";
 import tablePath from "/blackjack/blackjack-table.webp";
@@ -89,6 +100,7 @@ blackjackStage.addChild(tableFrame);
 
 import button from '/button.png';
 import button_pressed from '/button_pressed.png';
+import moneyManager from "../MoneyManager";
 await PIXI.Assets.load([
     button,
     button_pressed,
@@ -128,6 +140,7 @@ drawButton.onPress.connect(() => {
     if (game.finished) 
         return;
     game.drawCard();
+    creditsText.text = moneyManager.getBalance();
 });
 drawButton.textView!.style.fill = 0xffffff;
 blackjackStage.addChild(drawButton);
@@ -166,9 +179,20 @@ passButton.onPress.connect(() => {
     if (game.finished) 
         return;
     game.changeTurn();
+    if (game.getState() !== GameStates.CONTINUE) {
+        dealerReplay.text = game.getState();
+        dealerReplay.visible = true;
+        setTimeout(() => {
+            dealerReplay.text = "";
+            dealerReplay.visible = false;
+        }, 4000);
+        creditsText.text = moneyManager.getBalance();
+        return;
+    }
     while (game.getState() === GameStates.CONTINUE){
         game.drawCard();
     }
+    creditsText.text = moneyManager.getBalance();
 });
 passButton.textView!.style.fill = 0xffffff;
 blackjackStage.addChild(passButton);
@@ -205,6 +229,7 @@ restartButton.position.set(1740, 960);
 restartButton.zIndex = 2;
 restartButton.onPress.connect(() => {
     game.restart();
+    creditsText.text = moneyManager.getBalance();
 });
 restartButton.textView!.style.fill = 0xffffff;
 blackjackStage.addChild(restartButton);

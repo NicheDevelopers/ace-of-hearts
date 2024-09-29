@@ -214,7 +214,7 @@ export class BlackjackHand {
             if (this.score > 21) {
                 let aces = this.hand.filter((card) => card.rank.abbrn === 'A').length;
                 let bestScore = this.score;
-                while (this.score > 21 && aces > 0) {
+                while (bestScore > 21 && aces > 0) {
                     bestScore -= 10;
                     aces--;
                 }
