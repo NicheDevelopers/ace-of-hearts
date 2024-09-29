@@ -11,6 +11,22 @@ import blackjackStage from './blackjack/stage.ts';
 
 import './MoneyManager';
 
+import OpenAI from 'openai';
+import { OpenAIConfig } from './config.ts';
+
+const client = new OpenAI(OpenAIConfig);
+
+async function main() {
+  const params: OpenAI.Chat.ChatCompletionCreateParams = {
+    messages: [{ role: 'user', content: 'A confident and assertive croupier who takes pride in her card-playing skills. She enjoys games like poker and blackjack, where she can demonstrate her expertise and strategic prowess. Victoria is known for her sharp tongue and competitive nature, often teasing and taunting players to test their mettle at the card table. While she may come across as intimidating, her passion for the game is undeniable, and she seeks worthy opponents to engage in high-stakes card games.' + 'Hi, i would like to play blackjack' }],
+    model: 'gpt-3.5-turbo',
+  };
+  //const chatCompletion: OpenAI.Chat.ChatCompletion = await client.chat.completions.create(params);
+  //console.log(chatCompletion);
+}
+
+await main();
+
 await PIXI.Assets.load([
   dziadu,
 ]);
