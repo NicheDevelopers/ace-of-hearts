@@ -14,7 +14,7 @@ export class BlackjackGame {
     playerHand: BlackjackHand;
     dealerHand: BlackjackHand;
     turn: boolean = true;
-    finished: boolean = false;
+    finished: boolean = true;
     currentBet: number = 0;
     bet: number = 20;
     deltaBet: number = 10;
@@ -24,7 +24,6 @@ export class BlackjackGame {
         this.blackjackStage = blackjackStage;
         this.playerHand = new BlackjackHand(true, this.blackjackStage);
         this.dealerHand = new BlackjackHand(false, this.blackjackStage);
-        this.restart();
     }
 
     restart() {
@@ -67,7 +66,7 @@ export class BlackjackGame {
     showDealerHiddenCard() {
         const sprite = this.dealerHand.cardsImg[0];
         const startY = sprite.y;
-        sprite.zIndex = -1;
+        sprite.zIndex = 1;
         const downCardStart = () => {
             sprite.y += 2;
             if (sprite.y >= startY)
@@ -183,6 +182,7 @@ export class BlackjackHand {
             const hidden = (this.isPlayer) ? false : this.countCards() === 1;
             const sprite = PIXI.Sprite.from(CardImages[parseCardToString(card, hidden)]);
             sprite.scale = 0.85;
+            sprite.zIndex = 1;
             (Math.round(Math.random())) ? 
                     sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
             const offsetX = 60 * this.countCards() + Math.random() * 5;

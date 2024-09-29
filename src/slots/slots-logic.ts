@@ -84,7 +84,7 @@ export default function getLines(
     .slice(0, howManyLines);
 
   let lines = [] as Line[];
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < howManyLines; i++) {
     if (i < 10) {
       lines[i] = { heights: lineHeights[i], color: lineColors[10] };
       continue;

@@ -7,8 +7,10 @@ const blackjackStage = new PIXI.Container();
 const game = new BlackjackGame(blackjackStage);
 
 import hubPath from "/blackjack/blackjack-hub-labeled.png";
+import tablePath from "/blackjack/blackjack-table.webp";
+import tableFramePath from "/blackjack/clear-wood.webp";
 
-await PIXI.Assets.load([hubPath]);
+await PIXI.Assets.load([hubPath, tablePath, tableFramePath]);
 
 const hubTexture = PIXI.Texture.from(hubPath);
 const hub = new PIXI.Sprite(hubTexture);
@@ -18,9 +20,30 @@ hub.x = 0;
 hub.y = 1080;
 hub.width = 1920;
 hub.height = 180;
-hub.zIndex = 1;
-
+hub.zIndex = 2;
 blackjackStage.addChild(hub);
+
+const tableTexture = PIXI.Texture.from(tablePath);
+const table = new PIXI.Sprite(tableTexture);
+
+table.anchor.set(0, 0);
+table.x = 1000;
+table.y = 200;
+table.width = 920;
+table.height = 700;
+table.zIndex = 0;
+blackjackStage.addChild(table);
+
+const tableFrameTexture = PIXI.Texture.from(tableFramePath);
+const tableFrame = new PIXI.Sprite(tableFrameTexture);
+
+tableFrame.anchor.set(0, 0);
+tableFrame.x = 970;
+tableFrame.y = 170;
+tableFrame.width = 970;
+tableFrame.height = 750;
+tableFrame.zIndex = -1;
+blackjackStage.addChild(tableFrame);
 
 import button from '/button.png';
 import button_pressed from '/button_pressed.png';
