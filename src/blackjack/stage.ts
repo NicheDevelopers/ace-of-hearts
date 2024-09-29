@@ -4,11 +4,55 @@ import { FancyButton } from "@pixi/ui";
 
 const blackjackStage = new PIXI.Container();
 
-const game = new BlackjackGame(blackjackStage);
+const dealerReplay = new PIXI.Text("", { fontSize: 40, fill: 0xFFFFFF });
+dealerReplay.position.set(350, 300);
+dealerReplay.zIndex = 2;
+dealerReplay.visible = false;
+blackjackStage.addChild(dealerReplay);
+
+const youText = new PIXI.Text("YOU", { fontSize: 60, fill: 0xFFFFFF });
+youText.anchor.set(1, 0);
+youText.position.set(1870, 800);
+youText.zIndex = 2;
+blackjackStage.addChild(youText);
+
+const dealerText = new PIXI.Text("DEALER", { fontSize: 60, fill: 0xFFFFFF });
+dealerText.anchor.set(1, 0);
+dealerText.position.set(1870, 370);
+dealerText.zIndex = 2;
+blackjackStage.addChild(dealerText);
+
+const playerScoreText = new PIXI.Text("Score: ", { fontSize: 30, fill: 0xFFFFFF });
+playerScoreText.anchor.set(1, 0);
+playerScoreText.position.set(1870, 730);
+playerScoreText.zIndex = 2;
+blackjackStage.addChild(playerScoreText);
+
+const dealerScoreText = new PIXI.Text("Score: ", { fontSize: 30, fill: 0xFFFFFF });
+dealerScoreText.anchor.set(1, 0);
+dealerScoreText.position.set(1870, 300);
+dealerScoreText.zIndex = 2;
+blackjackStage.addChild(dealerScoreText);
+
+const game = new BlackjackGame(blackjackStage, dealerReplay, dealerScoreText, playerScoreText);
 
 import hubPath from "/blackjack/blackjack-hub-labeled.png";
+import tablePath from "/blackjack/blackjack-table.webp";
+import tableFramePath from "/blackjack/clear-wood.webp";
+import casinoBackground from "/blackjack/casino-background.jpg";
 
-await PIXI.Assets.load([hubPath]);
+await PIXI.Assets.load([hubPath, tablePath, tableFramePath, casinoBackground]);
+
+const backgroundTexture = PIXI.Texture.from(casinoBackground);
+const background = new PIXI.Sprite(backgroundTexture);
+
+background.anchor.set(0, 0);
+background.x = 0;
+background.y = -180;
+background.width = 1920;
+background.height = 1080;
+background.zIndex = -2;
+blackjackStage.addChild(background);
 
 const hubTexture = PIXI.Texture.from(hubPath);
 const hub = new PIXI.Sprite(hubTexture);
@@ -18,9 +62,30 @@ hub.x = 0;
 hub.y = 1080;
 hub.width = 1920;
 hub.height = 180;
-hub.zIndex = 1;
-
+hub.zIndex = 2;
 blackjackStage.addChild(hub);
+
+const tableTexture = PIXI.Texture.from(tablePath);
+const table = new PIXI.Sprite(tableTexture);
+
+table.anchor.set(0, 0);
+table.x = 1000;
+table.y = 200;
+table.width = 920;
+table.height = 700;
+table.zIndex = 0;
+blackjackStage.addChild(table);
+
+const tableFrameTexture = PIXI.Texture.from(tableFramePath);
+const tableFrame = new PIXI.Sprite(tableFrameTexture);
+
+tableFrame.anchor.set(0, 0);
+tableFrame.x = 970;
+tableFrame.y = 170;
+tableFrame.width = 970;
+tableFrame.height = 750;
+tableFrame.zIndex = -1;
+blackjackStage.addChild(tableFrame);
 
 import button from '/button.png';
 import button_pressed from '/button_pressed.png';

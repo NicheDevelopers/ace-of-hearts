@@ -14,17 +14,27 @@ export class BlackjackGame {
     playerHand: BlackjackHand;
     dealerHand: BlackjackHand;
     turn: boolean = true;
-    finished: boolean = false;
+    finished: boolean = true;
     currentBet: number = 0;
     bet: number = 20;
     deltaBet: number = 10;
     minBet: number = 10;
     maxBet: number = 90;
-    constructor(blackjackStage: PIXI.Container<PIXI.ContainerChild>) {
+    blackjackReplay: PIXI.Text;
+    playerScore: PIXI.Text;
+    dealerScore: PIXI.Text;
+    constructor(
+        blackjackStage: PIXI.Container<PIXI.ContainerChild>, 
+        blackjackReplay: PIXI.Text,
+        dealerScore: PIXI.Text,
+        playerScore: PIXI.Text
+    ) {
         this.blackjackStage = blackjackStage;
-        this.playerHand = new BlackjackHand(true, this.blackjackStage);
-        this.dealerHand = new BlackjackHand(false, this.blackjackStage);
-        this.restart();
+        this.playerScore = playerScore;
+        this.dealerScore = dealerScore;
+        this.playerHand = new BlackjackHand(true, this.blackjackStage, this.playerScore);
+        this.dealerHand = new BlackjackHand(false, this.blackjackStage, this.dealerScore);
+        this.blackjackReplay = blackjackReplay;
     }
 
     restart() {
@@ -34,11 +44,12 @@ export class BlackjackGame {
         this.blackjackStage.removeChild(...this.dealerHand.cardsImg);
         this.deck = new decks.StandardDeck({ jokers: 0 });
         this.deck.shuffleAll();
-        this.playerHand = new BlackjackHand(true, this.blackjackStage);
-        this.dealerHand = new BlackjackHand(false, this.blackjackStage);
+        this.playerHand = new BlackjackHand(true, this.blackjackStage, this.playerScore);
+        this.dealerHand = new BlackjackHand(false, this.blackjackStage, this.dealerScore);
         this.turn = true;
         this.playerHand.draw(this.deck.draw(2));
         this.dealerHand.draw(this.deck.draw(2));
+        this.dealerScore.text = 'Score: ?';
         this.finished = false;
     }
 
@@ -56,18 +67,31 @@ export class BlackjackGame {
             this.playerHand.draw(this.deck.draw(1)) 
             : this.dealerHand.draw(this.deck.draw(1));
         const state = this.getState();
-        if (state === GameStates.PLAYER_WIN || state === GameStates.DEALER_LOST) {
-            moneyManager.addMoney(this.currentBet * 2);
-        }
-        if (state === GameStates.DRAW) {
-            moneyManager.addMoney(this.currentBet);
+        if (state !== GameStates.CONTINUE) {
+            this.blackjackReplay.text = state;
+            if (state === GameStates.PLAYER_WIN || state === GameStates.DEALER_LOST) {
+                moneyManager.addMoney(this.currentBet * 2);
+                // TODO: Add dealer text to show - player win
+            }
+            if (state === GameStates.DRAW) {
+                moneyManager.addMoney(this.currentBet);
+                // TODO: Add dealer text to show - draw
+            }
+            if (state === GameStates.PLAYER_LOST || state === GameStates.DEALER_WIN) {
+                // TODO: Add dealer text to show - player lost
+            }
+            this.blackjackReplay.visible = true;
+            setTimeout(() => {
+                this.blackjackReplay.text = "";
+                this.blackjackReplay.visible = false;
+            }, 4000);
         }
     }
 
     showDealerHiddenCard() {
         const sprite = this.dealerHand.cardsImg[0];
         const startY = sprite.y;
-        sprite.zIndex = -1;
+        sprite.zIndex = 1;
         const downCardStart = () => {
             sprite.y += 2;
             if (sprite.y >= startY)
@@ -168,21 +192,41 @@ export class BlackjackHand {
     hand: Card[];
     score: number;
     cardsImg: PIXI.Sprite[];
-    constructor(isPlayer: boolean, blackjackStage: PIXI.Container<PIXI.ContainerChild>) {
+    scoreText: PIXI.Text;
+    constructor(
+        isPlayer: boolean, 
+        blackjackStage: PIXI.Container<PIXI.ContainerChild>,
+        scoreText: PIXI.Text
+    ) {
         this.blackjackStage = blackjackStage;
         this.hand = [];
         this.score = 0;
         this.isPlayer = isPlayer;
         this.cardsImg = [];
+        this.scoreText = scoreText;
     }
 
     draw(cards: Card[]){
         cards.map((card) => {
             this.hand.push(card);
             this.score += CardValues[card.rank.abbrn];
+            this.scoreText.text = `Score: `;
+            if (this.score > 21) {
+                let aces = this.hand.filter((card) => card.rank.abbrn === 'A').length;
+                let bestScore = this.score;
+                while (this.score > 21 && aces > 0) {
+                    bestScore -= 10;
+                    aces--;
+                }
+                this.scoreText.text += `${bestScore}`;
+            }
+            else {
+                this.scoreText.text += `${this.score}`;
+            }
             const hidden = (this.isPlayer) ? false : this.countCards() === 1;
             const sprite = PIXI.Sprite.from(CardImages[parseCardToString(card, hidden)]);
             sprite.scale = 0.85;
+            sprite.zIndex = 1;
             (Math.round(Math.random())) ? 
                     sprite.rotation += Math.random() / 20 : sprite.rotation -= Math.random() / 20;
             const offsetX = 60 * this.countCards() + Math.random() * 5;
