@@ -140,7 +140,6 @@ function getLineGraphics(line: Line) {
 
 const GAMES = [
   witcherPaytable,
-  pixiPaytable,
   wildWestPaytable,
   penguinsPaytable,
 ];

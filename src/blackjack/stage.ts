@@ -1,11 +1,19 @@
 import * as PIXI from "pixi.js";
-import { BlackjackGame, GameStates } from "./game";
+import { BlackjackGame } from "./game";
 import { FancyButton } from "@pixi/ui";
+
+import button from '/button.png';
+import button_pressed from '/button_pressed.png';
+import moneyManager from "../MoneyManager";
+await PIXI.Assets.load([
+    button,
+    button_pressed,
+]);
 
 const blackjackStage = new PIXI.Container();
 
 const dealerReplay = new PIXI.Text("", { fontSize: 40, fill: 0xFFFFFF });
-dealerReplay.position.set(350, 300);
+dealerReplay.position.set(750, 80);
 dealerReplay.zIndex = 2;
 dealerReplay.visible = false;
 blackjackStage.addChild(dealerReplay);
@@ -52,7 +60,61 @@ import tablePath from "/blackjack/blackjack-table.webp";
 import tableFramePath from "/blackjack/clear-wood.webp";
 import casinoBackground from "/blackjack/casino-background.jpg";
 
-await PIXI.Assets.load([hubPath, tablePath, tableFramePath, casinoBackground]);
+import isabella from "/blackjack/dealers/isabella.png";
+import lila from "/blackjack/dealers/lila.png";
+import victoria from "/blackjack/dealers/victoria.png";
+import { dealersAnswers, GameStates } from "./util";
+
+await PIXI.Assets.load([hubPath, tablePath, tableFramePath, casinoBackground, isabella, lila, victoria]);
+const dealers = { names: [isabella, lila, victoria], count: 0 };
+
+let dealerTexture = PIXI.Texture.from(dealers.names[dealers.count]);
+let dealer = new PIXI.Sprite(dealerTexture);
+
+dealer.anchor.set(1, 1);
+dealer.x = 800;
+dealer.y = 900;
+dealer.zIndex = 1;
+dealer.scale = 1.25;
+blackjackStage.addChild(dealer);
+
+const changeDealerButton = new FancyButton({
+    defaultView: button,
+    hoverView: button_pressed,
+    pressedView: button_pressed,
+    text: 'Dealer',
+    defaultTextScale: 2,
+    scale: 0.3,
+    animations: {
+         hover: {
+             props: {
+                 scale: {
+                     x: 1.1,
+                     y: 1.1,
+                 }
+             },
+             duration: 100,
+         },
+         pressed: {
+             props: {
+                 scale: {
+                     x: 0.9,
+                     y: 0.9,
+                 }
+             },
+             duration: 100,
+         }
+     }
+});
+changeDealerButton.position.set(75, 100);
+changeDealerButton.zIndex = 3;
+changeDealerButton.onPress.connect(() => {
+    dealers.count = (dealers.count + 1) % dealers.names.length;
+    dealerTexture = PIXI.Texture.from(dealers.names[dealers.count]);
+    dealer.texture = dealerTexture;
+});
+changeDealerButton.textView!.style.fill = 0xffffff;
+blackjackStage.addChild(changeDealerButton);
 
 const backgroundTexture = PIXI.Texture.from(casinoBackground);
 const background = new PIXI.Sprite(backgroundTexture);
@@ -97,14 +159,6 @@ tableFrame.width = 970;
 tableFrame.height = 750;
 tableFrame.zIndex = -1;
 blackjackStage.addChild(tableFrame);
-
-import button from '/button.png';
-import button_pressed from '/button_pressed.png';
-import moneyManager from "../MoneyManager";
-await PIXI.Assets.load([
-    button,
-    button_pressed,
-]);
 
 const drawButton = new FancyButton({
     defaultView: button,
@@ -180,7 +234,7 @@ passButton.onPress.connect(() => {
         return;
     game.changeTurn();
     if (game.getState() !== GameStates.CONTINUE) {
-        dealerReplay.text = game.getState();
+        dealerReplay.text = dealersAnswers[game.getState()][Math.floor(Math.random() * dealersAnswers[game.getState()].length)];
         dealerReplay.visible = true;
         setTimeout(() => {
             dealerReplay.text = "";
