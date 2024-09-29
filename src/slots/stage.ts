@@ -347,6 +347,7 @@ function setupReels() {
     CURRENT_GAME = GAMES[CURRENT_GAME_IDX % GAMES.length];
     console.log(CURRENT_GAME_IDX % GAMES.length);
     slotTextures = CURRENT_GAME.getTextures();
+    highlightedLines = [];
     setupReels();
   };
 
