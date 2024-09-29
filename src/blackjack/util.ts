@@ -8,12 +8,12 @@ export enum GameStates {
 }
 
 export const dealersAnswers = {
-    [GameStates.PLAYER_LOST]: ['a', 'aa', 'aaa'],
-    [GameStates.PLAYER_WIN]: ['b', 'bb', 'bbb'],
-    [GameStates.DEALER_WIN]: ['c', 'cc', 'ccc'],
-    [GameStates.DEALER_LOST]: ['d', 'dd', 'ddd'],
-    [GameStates.DRAW]: ['e', 'ee', 'eee'],
-    [GameStates.CONTINUE]: ['f', 'ff', 'fff'],
+    [GameStates.PLAYER_LOST]: ['You lost!', 'I beat you :('],
+    [GameStates.PLAYER_WIN]: ['You won!', 'You are lucky!', 'You beat me!'],
+    [GameStates.DEALER_WIN]: ['I won!', 'I beat you!', 'You lost!'],
+    [GameStates.DEALER_LOST]: ['You won!', 'You are lucky!', 'You beat me!'],
+    [GameStates.DRAW]: ['Draw!', 'It\'s a draw!', 'No one won!'],
+    [GameStates.CONTINUE]: ['Game goes on!', 'Let\'s play!', 'Your turn!'],
 } as Record<GameStates, string[]>;
 
 export const CardValues = {
