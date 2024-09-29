@@ -9,8 +9,20 @@ const game = new BlackjackGame(blackjackStage);
 import hubPath from "/blackjack/blackjack-hub-labeled.png";
 import tablePath from "/blackjack/blackjack-table.webp";
 import tableFramePath from "/blackjack/clear-wood.webp";
+import casinoBackground from "/blackjack/casino-background.jpg";
 
-await PIXI.Assets.load([hubPath, tablePath, tableFramePath]);
+await PIXI.Assets.load([hubPath, tablePath, tableFramePath, casinoBackground]);
+
+const backgroundTexture = PIXI.Texture.from(casinoBackground);
+const background = new PIXI.Sprite(backgroundTexture);
+
+background.anchor.set(0, 0);
+background.x = 0;
+background.y = -180;
+background.width = 1920;
+background.height = 1080;
+background.zIndex = -2;
+blackjackStage.addChild(background);
 
 const hubTexture = PIXI.Texture.from(hubPath);
 const hub = new PIXI.Sprite(hubTexture);
