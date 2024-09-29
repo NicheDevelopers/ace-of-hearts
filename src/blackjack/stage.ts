@@ -4,7 +4,13 @@ import { FancyButton } from "@pixi/ui";
 
 const blackjackStage = new PIXI.Container();
 
-const game = new BlackjackGame(blackjackStage);
+const dealerReplay = new PIXI.Text("", { fontSize: 40, fill: 0xFFFFFF });
+dealerReplay.position.set(1000, 200);
+dealerReplay.zIndex = 2;
+dealerReplay.visible = false;
+blackjackStage.addChild(dealerReplay);
+
+const game = new BlackjackGame(blackjackStage, dealerReplay);
 
 import hubPath from "/blackjack/blackjack-hub-labeled.png";
 import tablePath from "/blackjack/blackjack-table.webp";

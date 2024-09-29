@@ -20,10 +20,15 @@ export class BlackjackGame {
     deltaBet: number = 10;
     minBet: number = 10;
     maxBet: number = 90;
-    constructor(blackjackStage: PIXI.Container<PIXI.ContainerChild>) {
+    blackjackReplay: PIXI.Text;
+    constructor(
+        blackjackStage: PIXI.Container<PIXI.ContainerChild>, 
+        blackjackReplay: PIXI.Text
+    ) {
         this.blackjackStage = blackjackStage;
         this.playerHand = new BlackjackHand(true, this.blackjackStage);
         this.dealerHand = new BlackjackHand(false, this.blackjackStage);
+        this.blackjackReplay = blackjackReplay;
     }
 
     restart() {
@@ -55,11 +60,24 @@ export class BlackjackGame {
             this.playerHand.draw(this.deck.draw(1)) 
             : this.dealerHand.draw(this.deck.draw(1));
         const state = this.getState();
-        if (state === GameStates.PLAYER_WIN || state === GameStates.DEALER_LOST) {
-            moneyManager.addMoney(this.currentBet * 2);
-        }
-        if (state === GameStates.DRAW) {
-            moneyManager.addMoney(this.currentBet);
+        if (state !== GameStates.CONTINUE) {
+            this.blackjackReplay.text = state;
+            if (state === GameStates.PLAYER_WIN || state === GameStates.DEALER_LOST) {
+                moneyManager.addMoney(this.currentBet * 2);
+                // TODO: Add dealer text to show - player win
+            }
+            if (state === GameStates.DRAW) {
+                moneyManager.addMoney(this.currentBet);
+                // TODO: Add dealer text to show - draw
+            }
+            if (state === GameStates.PLAYER_LOST || state === GameStates.DEALER_WIN) {
+                // TODO: Add dealer text to show - player lost
+            }
+            this.blackjackReplay.visible = true;
+            setTimeout(() => {
+                this.blackjackReplay.text = "";
+                this.blackjackReplay.visible = false;
+            }, 4000);
         }
     }
 
