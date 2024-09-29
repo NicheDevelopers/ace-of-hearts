@@ -92,7 +92,7 @@ export class BlackjackGame {
         app.ticker.add(upCardStart);
     }
 
-    getState(): string {
+    getState(): GameStates {
         if (this.turn){
             if (this.playerHand.score > 21) {
                 const aces = this.playerHand.hand.filter((card) => card.rank.abbrn === 'A').length;
