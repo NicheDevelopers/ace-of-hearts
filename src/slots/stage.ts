@@ -373,6 +373,7 @@ function reelsComplete() {
 
   endSymbolUrls; // <- tutaj array z url symboli które się wylosowały
   const lines = getLines(5, 4, LINE_COUNT);
+  console.log(lines);
 
   currentHighlight = 0;
   let totalScore = 0;
@@ -380,6 +381,7 @@ function reelsComplete() {
   for (const line of lines) {
     let symbolsOnLine: string[] = [];
     for (let i = 0; i < REELS_COUNT; i++) {
+      console.log(line, i);
       symbolsOnLine.push(endSymbolUrls[i][line.heights[i]]);
     }
     const score = getLineScore(symbolsOnLine, CURRENT_GAME);
