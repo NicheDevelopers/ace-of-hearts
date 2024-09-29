@@ -60,9 +60,9 @@ import tablePath from "/blackjack/blackjack-table.webp";
 import tableFramePath from "/blackjack/clear-wood.webp";
 import casinoBackground from "/blackjack/casino-background.jpg";
 
-import isabella from "/blackjack/dealers/isabella.jpeg";
-import lila from "/blackjack/dealers/lila.jpeg";
-import victoria from "/blackjack/dealers/victoria.jpeg";
+import isabella from "/blackjack/dealers/isabella.png";
+import lila from "/blackjack/dealers/lila.png";
+import victoria from "/blackjack/dealers/victoria.png";
 import { dealersAnswers, GameStates } from "./util";
 
 await PIXI.Assets.load([hubPath, tablePath, tableFramePath, casinoBackground, isabella, lila, victoria]);
@@ -71,11 +71,11 @@ const dealers = { names: [isabella, lila, victoria], count: 0 };
 let dealerTexture = PIXI.Texture.from(dealers.names[dealers.count]);
 let dealer = new PIXI.Sprite(dealerTexture);
 
-dealer.x = 80;
-dealer.y = 0;
-dealer.width = 800;
-dealer.height = 900;
+dealer.anchor.set(1, 1);
+dealer.x = 800;
+dealer.y = 900;
 dealer.zIndex = 1;
+dealer.scale = 1.25;
 blackjackStage.addChild(dealer);
 
 const changeDealerButton = new FancyButton({
