@@ -1,4 +1,5 @@
 import { Assets, Texture } from "pixi.js";
+import * as PIXI from "pixi.js";
 
 export interface PaytableEntry {
   textureUrl: string;
@@ -13,9 +14,19 @@ export interface PaytableEntry {
 
 export class Paytable {
   symbols: PaytableEntry[];
+  horseShoeSprite: PIXI.Sprite;
 
-  constructor(symbols: PaytableEntry[]) {
+  constructor(symbols: PaytableEntry[], horseShoe: string) {
+    console.log(horseShoe);
     this.symbols = symbols;
+    const witcherTexture = PIXI.Texture.from(horseShoe);
+    this.horseShoeSprite = new PIXI.Sprite(witcherTexture);
+
+    this.horseShoeSprite.anchor.set(0, 0);
+    this.horseShoeSprite.x = 0;
+    this.horseShoeSprite.y = 0;
+    this.horseShoeSprite.width = 1920;
+    this.horseShoeSprite.height = 1080;
   }
   async init() {
     const promises = this.symbols.map(
@@ -30,7 +41,10 @@ export class Paytable {
     return this.symbols.find((s) => s.textureUrl === url)!;
   }
   getRandomTextureIndex() {
-    const raritySum = this.symbols.reduce((acc, s) => acc + (4 - s.rarity) ** 2, 0);
+    const raritySum = this.symbols.reduce(
+      (acc, s) => acc + (4 - s.rarity) ** 2,
+      0,
+    );
     const random = Math.floor(Math.random() * raritySum);
 
     let current = 0;

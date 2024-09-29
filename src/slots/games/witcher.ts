@@ -1,4 +1,6 @@
+import { Assets } from "pixi.js";
 import { Paytable, PaytableEntry } from "../Paytable";
+import witcherHorseshoePath from "/slots/witcher-background.png";
 
 const witcherEntries: PaytableEntry[] = [
   {
@@ -92,7 +94,9 @@ const witcherEntries: PaytableEntry[] = [
     textureUrl: "http://localhost:3000/slots/triss.png",
   },
 ];
-const witcherPaytable = new Paytable(witcherEntries);
+
+await Assets.load(witcherHorseshoePath);
+const witcherPaytable = new Paytable(witcherEntries, witcherHorseshoePath);
 await witcherPaytable.init();
 
 export default witcherPaytable;

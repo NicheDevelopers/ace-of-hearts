@@ -6,8 +6,10 @@ import witcherHorseshoePath from "/slots/witcher-background.png";
 import plasterPath from "/slots/wooden-plaster.png";
 
 await Assets.load([
-  slotsBorderPath, slotsHubPath,
-  backgroundPath, witcherHorseshoePath,
+  slotsBorderPath,
+  slotsHubPath,
+  backgroundPath,
+  witcherHorseshoePath,
   plasterPath,
 ]);
 import button from "/button.png";
@@ -55,14 +57,14 @@ slotsHub.y = 1080;
 slotsHub.width = 1920;
 slotsHub.height = 180;
 
-const witcherTexture = PIXI.Texture.from(witcherHorseshoePath);
-const witcherHorseshoe = new PIXI.Sprite(witcherTexture);
+// const witcherTexture = PIXI.Texture.from(witcherHorseshoePath);
+// const witcherHorseshoe = new PIXI.Sprite(witcherTexture);
 
-witcherHorseshoe.anchor.set(0, 0);
-witcherHorseshoe.x = 0;
-witcherHorseshoe.y = 0;
-witcherHorseshoe.width = 1920;
-witcherHorseshoe.height = 1080;
+// witcherHorseshoe.anchor.set(0, 0);
+// witcherHorseshoe.x = 0;
+// witcherHorseshoe.y = 0;
+// witcherHorseshoe.width = 1920;
+// witcherHorseshoe.height = 1080;
 
 const plasterTexture = PIXI.Texture.from(plasterPath);
 const plaster = new PIXI.Sprite(plasterTexture);
@@ -106,12 +108,13 @@ import {
   FillGradient,
 } from "pixi.js";
 import app from "../app";
-import pixiPaytable from "./games/pixi";
 import witcherPaytable from "./games/witcher";
 import getLines, { Line } from "./slots-logic";
 import { getLineScore } from "./scoring";
 import moneyManager from "../MoneyManager";
 import { FancyButton } from "@pixi/ui";
+import pixiPaytable from "./games/pixi";
+import { hearts } from "cards/build/suits";
 
 function getLineGraphics(line: Line) {
   const lineGraphics = new Graphics();
@@ -133,7 +136,9 @@ function getLineGraphics(line: Line) {
   return lineGraphics;
 }
 
-let CURRENT_GAME = witcherPaytable;
+const GAMES = [witcherPaytable, pixiPaytable];
+let CURRENT_GAME_IDX = 0;
+let CURRENT_GAME = GAMES[CURRENT_GAME_IDX];
 
 const REEL_WIDTH = 200;
 const SYMBOL_SIZE = 180;
@@ -144,8 +149,8 @@ let BET_AMOUNT = 25;
 let LAST_WIN = 0;
 
 // Build the reels
-const reels = [] as Reel[];
-const reelContainer = new Container();
+let reels = [] as Reel[];
+let reelContainer = new Container();
 
 const winText = new PIXI.Text(`${LAST_WIN}`, {
   fontSize: 60,
@@ -164,6 +169,10 @@ creditsText.position.set(632, 995);
 creditsText.zIndex = 2;
 
 function setupReels() {
+  reels = [];
+  reelContainer = new Container();
+  slotsStage.removeChildren();
+  reelContainer.removeChildren();
   for (let i = 0; i < 5; i++) {
     const rc = new Container();
 
@@ -201,7 +210,7 @@ function setupReels() {
   slotsStage.addChild(slotsBorder);
   // slotsHub is added later to be on the top
   slotsStage.addChild(reelContainer);
-  slotsStage.addChild(witcherHorseshoe);
+  slotsStage.addChild(CURRENT_GAME.horseShoeSprite);
   slotsStage.addChild(plaster);
 
   // Adjust margins and positioning
@@ -325,10 +334,61 @@ function setupReels() {
   linesMinusButton.y = 990;
   linesMinusButton.zIndex = 99;
 
+  // Assusmes we switched game idx before calling
+  const switchGame = () => {
+    console.log("next game");
+    console.log(CURRENT_GAME_IDX);
+    CURRENT_GAME = GAMES[CURRENT_GAME_IDX % GAMES.length];
+    console.log(CURRENT_GAME_IDX % GAMES.length);
+    slotTextures = CURRENT_GAME.getTextures();
+    setupReels();
+  };
+
+  const previousGameButton = new FancyButton({
+    defaultView: button,
+    pressedView: button_pressed,
+    text: "Previous Game",
+    defaultTextScale: 1.5,
+    scale: 0.5,
+    animations: buttonAnimation,
+  });
+  previousGameButton.textView!.style.fill = { color: "#ffffff" };
+  previousGameButton.anchor.set(0.5);
+  previousGameButton.onPress.connect(() => {
+    CURRENT_GAME_IDX--;
+    CURRENT_GAME_IDX = Math.abs(CURRENT_GAME_IDX);
+    switchGame();
+  });
+  previousGameButton.x = 100;
+  previousGameButton.y = app.screen.height / 2;
+  previousGameButton.zIndex = 99;
+
+  const nextGameButton = new FancyButton({
+    defaultView: button,
+    pressedView: button_pressed,
+    text: "Next Game",
+    defaultTextScale: 2,
+    scale: 0.5,
+    animations: buttonAnimation,
+  });
+  nextGameButton.textView!.style.fill = { color: "#ffffff" };
+  nextGameButton.anchor.set(0.5);
+  nextGameButton.onPress.connect(() => {
+    CURRENT_GAME_IDX++;
+    CURRENT_GAME_IDX = Math.abs(CURRENT_GAME_IDX);
+    switchGame();
+  });
+  nextGameButton.x = 1920 - 100;
+  nextGameButton.y = app.screen.height / 2;
+  nextGameButton.zIndex = 99;
+
   bottom.addChild(betText);
   bottom.addChild(linesText);
   bottom.addChild(winText);
   bottom.addChild(creditsText);
+
+  bottom.addChild(previousGameButton);
+  bottom.addChild(nextGameButton);
 
   bottom.addChild(restartButton);
   bottom.addChild(betPlusButton);
@@ -384,9 +444,7 @@ function startPlay() {
     const target = r.position + 10 + i * 2;
     const time = 500 + i * 200;
     tweenTo(r, "position", target, time, backout(0.05), null, () => {
-      const sortedReel = [...(r.symbols as Sprite[])].sort(
-        (a, b) => a.y - b.y,
-      );
+      const sortedReel = [...(r.symbols as Sprite[])].sort((a, b) => a.y - b.y);
       // delete the first element - the one hidden behind the header
       sortedReel.shift();
 
@@ -417,7 +475,12 @@ function reelsComplete() {
     for (let i = 0; i < REELS_COUNT; i++) {
       symbolsOnLine.push(endSymbolUrls[i][line.heights[i]]);
     }
-    const score = getLineScore(symbolsOnLine, CURRENT_GAME, LINE_COUNT, BET_AMOUNT);
+    const score = getLineScore(
+      symbolsOnLine,
+      CURRENT_GAME,
+      LINE_COUNT,
+      BET_AMOUNT,
+    );
     totalScore += score;
     winText.text = totalScore;
     if (score > 0) {
@@ -439,10 +502,10 @@ function reelsComplete() {
 // index of the currently highlighted line from highlightedLines
 let currentHighlight = 0;
 
-const slotTextures = CURRENT_GAME.getTextures();
+let slotTextures = CURRENT_GAME.getTextures();
 
 function highlightLines() {
-  if (running && !bigWinAnim || highlightedLines.length === 0) return;
+  if ((running && !bigWinAnim) || highlightedLines.length === 0) return;
 
   const child = highlightedLines[currentHighlight];
 
@@ -581,8 +644,8 @@ function bigWin(winAmount: number) {
     wordWrap: true,
     wordWrapWidth: 2040,
   });
-  const text = (winAmount >= 5000) ? "GIGA WIN" :
-  (winAmount >= 2500)? "HUGE WIN" : "BIG WIN";
+  const text =
+    winAmount >= 5000 ? "GIGA WIN" : winAmount >= 2500 ? "HUGE WIN" : "BIG WIN";
 
   const bigWinText = new Text(text, style);
 
