@@ -63,8 +63,6 @@ drawButton.onPress.connect(() => {
     if (game.finished) 
         return;
     game.drawCard();
-    if (game.getState() !== GameStates.CONTINUE) 
-        console.log(game.getState());
 });
 drawButton.textView!.style.fill = 0xffffff;
 blackjackStage.addChild(drawButton);
@@ -102,13 +100,10 @@ passButton.zIndex = 2;
 passButton.onPress.connect(() => {
     if (game.finished) 
         return;
-    console.log('Passing turn');
     game.changeTurn();
     while (game.getState() === GameStates.CONTINUE){
         game.drawCard();
-        console.log('Game state:', game.getState());
     }
-    console.log('Game state after dealer moves:', game.getState());
 });
 passButton.textView!.style.fill = 0xffffff;
 blackjackStage.addChild(passButton);
@@ -144,7 +139,6 @@ const restartButton = new FancyButton({
 restartButton.position.set(1740, 960);
 restartButton.zIndex = 2;
 restartButton.onPress.connect(() => {
-    console.log('Restarting game');
     game.restart();
 });
 restartButton.textView!.style.fill = 0xffffff;

@@ -4,6 +4,7 @@ import * as PIXI from 'pixi.js';
 import { parseCardToString } from './parser';
 import app from '../app';
 import { CardImages } from './cardImages';
+import moneyManager from '../MoneyManager';
 
 await PIXI.Assets.load(Object.values(CardImages));
 
@@ -14,6 +15,7 @@ export class BlackjackGame {
     dealerHand: BlackjackHand;
     turn: boolean = true;
     finished: boolean = false;
+    currentBet: number = 0;
     bet: number = 20;
     deltaBet: number = 10;
     minBet: number = 10;
@@ -26,6 +28,12 @@ export class BlackjackGame {
     }
 
     restart() {
+        if (moneyManager.getBalance() >= this.bet) { 
+            moneyManager.addMoney(-this.bet); 
+            this.currentBet = this.bet;
+        }
+        else
+         console.log('Not enough money');
         this.blackjackStage.removeChild(...this.playerHand.cardsImg);
         this.blackjackStage.removeChild(...this.dealerHand.cardsImg);
         this.deck = new decks.StandardDeck({ jokers: 0 });
@@ -51,6 +59,14 @@ export class BlackjackGame {
         (this.turn) ? 
             this.playerHand.draw(this.deck.draw(1)) 
             : this.dealerHand.draw(this.deck.draw(1));
+        const state = this.getState();
+        console.log(state);
+        if (state === GameStates.PLAYER_WIN || state === GameStates.dealer_LOST) {
+            moneyManager.addMoney(this.currentBet * 2);
+        }
+        if (state === GameStates.DRAW) {
+            moneyManager.addMoney(this.currentBet);
+        }
     }
 
     showDealerHiddenCard() {
@@ -158,7 +174,6 @@ export class BlackjackHand {
     score: number;
     cardsImg: PIXI.Sprite[];
     constructor(isPlayer: boolean, blackjackStage: PIXI.Container<PIXI.ContainerChild>) {
-        console.log('Blackjack hand started');
         this.blackjackStage = blackjackStage;
         this.hand = [];
         this.score = 0;
@@ -197,9 +212,6 @@ export class BlackjackHand {
             app.ticker.add(fnTicker);
             this.cardsImg.push(sprite);
         })
-
-        console.log((this.isPlayer) ? 'Player' : 'dealer', 'hand', this.hand);
-        console.log('Actual score: ', this.score, ' number of cards: ', this.countCards());
     }
 
     countCards(): number{
