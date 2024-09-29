@@ -116,6 +116,7 @@ import { FancyButton } from "@pixi/ui";
 import pixiPaytable from "./games/pixi";
 import { hearts } from "cards/build/suits";
 import wildWestPaytable from "./games/wildWest";
+import penguinsPaytable from "./games/penguins";
 
 function getLineGraphics(line: Line) {
   const lineGraphics = new Graphics();
@@ -137,7 +138,12 @@ function getLineGraphics(line: Line) {
   return lineGraphics;
 }
 
-const GAMES = [witcherPaytable, pixiPaytable, wildWestPaytable];
+const GAMES = [
+  witcherPaytable,
+  pixiPaytable,
+  wildWestPaytable,
+  penguinsPaytable,
+];
 let CURRENT_GAME_IDX = 0;
 let CURRENT_GAME = GAMES[CURRENT_GAME_IDX];
 
@@ -345,26 +351,6 @@ function setupReels() {
     setupReels();
   };
 
-  const previousGameButton = new FancyButton({
-    defaultView: button,
-    pressedView: button_pressed,
-    text: "Previous Game",
-    defaultTextScale: 1.5,
-    scale: 0.5,
-    animations: buttonAnimation,
-  });
-  previousGameButton.textView!.style.fill = { color: "#ffffff" };
-  previousGameButton.anchor.set(0.5);
-  previousGameButton.onPress.connect(() => {
-    if (running) return;
-    CURRENT_GAME_IDX--;
-    CURRENT_GAME_IDX = Math.abs(CURRENT_GAME_IDX);
-    switchGame();
-  });
-  previousGameButton.x = 100;
-  previousGameButton.y = app.screen.height / 2;
-  previousGameButton.zIndex = 99;
-
   const nextGameButton = new FancyButton({
     defaultView: button,
     pressedView: button_pressed,
@@ -390,7 +376,6 @@ function setupReels() {
   bottom.addChild(winText);
   bottom.addChild(creditsText);
 
-  bottom.addChild(previousGameButton);
   bottom.addChild(nextGameButton);
 
   bottom.addChild(restartButton);
