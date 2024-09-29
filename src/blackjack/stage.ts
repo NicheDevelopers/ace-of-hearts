@@ -5,12 +5,36 @@ import { FancyButton } from "@pixi/ui";
 const blackjackStage = new PIXI.Container();
 
 const dealerReplay = new PIXI.Text("", { fontSize: 40, fill: 0xFFFFFF });
-dealerReplay.position.set(1000, 200);
+dealerReplay.position.set(350, 300);
 dealerReplay.zIndex = 2;
 dealerReplay.visible = false;
 blackjackStage.addChild(dealerReplay);
 
-const game = new BlackjackGame(blackjackStage, dealerReplay);
+const youText = new PIXI.Text("YOU", { fontSize: 60, fill: 0xFFFFFF });
+youText.anchor.set(1, 0);
+youText.position.set(1870, 800);
+youText.zIndex = 2;
+blackjackStage.addChild(youText);
+
+const dealerText = new PIXI.Text("DEALER", { fontSize: 60, fill: 0xFFFFFF });
+dealerText.anchor.set(1, 0);
+dealerText.position.set(1870, 370);
+dealerText.zIndex = 2;
+blackjackStage.addChild(dealerText);
+
+const playerScoreText = new PIXI.Text("Score: ", { fontSize: 30, fill: 0xFFFFFF });
+playerScoreText.anchor.set(1, 0);
+playerScoreText.position.set(1870, 730);
+playerScoreText.zIndex = 2;
+blackjackStage.addChild(playerScoreText);
+
+const dealerScoreText = new PIXI.Text("Score: ", { fontSize: 30, fill: 0xFFFFFF });
+dealerScoreText.anchor.set(1, 0);
+dealerScoreText.position.set(1870, 300);
+dealerScoreText.zIndex = 2;
+blackjackStage.addChild(dealerScoreText);
+
+const game = new BlackjackGame(blackjackStage, dealerReplay, dealerScoreText, playerScoreText);
 
 import hubPath from "/blackjack/blackjack-hub-labeled.png";
 import tablePath from "/blackjack/blackjack-table.webp";
