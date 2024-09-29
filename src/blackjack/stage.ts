@@ -1,5 +1,5 @@
 import * as PIXI from "pixi.js";
-import { BlackjackGame, GameStates } from "./game";
+import { BlackjackGame } from "./game";
 import { FancyButton } from "@pixi/ui";
 
 import button from '/button.png';
@@ -63,6 +63,7 @@ import casinoBackground from "/blackjack/casino-background.jpg";
 import isabella from "/blackjack/dealers/isabella.jpeg";
 import lila from "/blackjack/dealers/lila.jpeg";
 import victoria from "/blackjack/dealers/victoria.jpeg";
+import { dealersAnswers, GameStates } from "./util";
 
 await PIXI.Assets.load([hubPath, tablePath, tableFramePath, casinoBackground, isabella, lila, victoria]);
 const dealers = { names: [isabella, lila, victoria], count: 0 };
@@ -233,7 +234,7 @@ passButton.onPress.connect(() => {
         return;
     game.changeTurn();
     if (game.getState() !== GameStates.CONTINUE) {
-        dealerReplay.text = game.getState();
+        dealerReplay.text = dealersAnswers[game.getState()][Math.floor(Math.random() * dealersAnswers[game.getState()].length)];
         dealerReplay.visible = true;
         setTimeout(() => {
             dealerReplay.text = "";
