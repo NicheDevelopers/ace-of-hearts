@@ -355,6 +355,7 @@ function setupReels() {
   previousGameButton.textView!.style.fill = { color: "#ffffff" };
   previousGameButton.anchor.set(0.5);
   previousGameButton.onPress.connect(() => {
+    if (running) return;
     CURRENT_GAME_IDX--;
     CURRENT_GAME_IDX = Math.abs(CURRENT_GAME_IDX);
     switchGame();
@@ -374,6 +375,7 @@ function setupReels() {
   nextGameButton.textView!.style.fill = { color: "#ffffff" };
   nextGameButton.anchor.set(0.5);
   nextGameButton.onPress.connect(() => {
+    if (running) return;
     CURRENT_GAME_IDX++;
     CURRENT_GAME_IDX = Math.abs(CURRENT_GAME_IDX);
     switchGame();
