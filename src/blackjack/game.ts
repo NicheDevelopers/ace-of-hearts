@@ -28,12 +28,8 @@ export class BlackjackGame {
     }
 
     restart() {
-        if (moneyManager.getBalance() >= this.bet) { 
-            moneyManager.addMoney(-this.bet); 
-            this.currentBet = this.bet;
-        }
-        else
-         console.log('Not enough money');
+        moneyManager.subtractMoney(this.bet);
+        this.currentBet = this.bet;
         this.blackjackStage.removeChild(...this.playerHand.cardsImg);
         this.blackjackStage.removeChild(...this.dealerHand.cardsImg);
         this.deck = new decks.StandardDeck({ jokers: 0 });
