@@ -117,7 +117,8 @@ const REEL_WIDTH = 200;
 const SYMBOL_SIZE = 180;
 const VISIBLE_ROWS = 4; // Increase this value to show more rows
 const REELS_COUNT = 5;
-const BET_AMOUNT = 25;
+let LINE_COUNT = 50;
+let BET_AMOUNT = 25;
 
 // Create different slot symbols
 const slotTextures = CURRENT_GAME.getTextures();
@@ -220,7 +221,87 @@ function setupReels() {
   restartButton.y = 980;
   restartButton.zIndex = 99;
 
+  const betPlusButton = new FancyButton({
+    defaultView: button,
+    pressedView: button_pressed,
+    text: "+",
+    defaultTextScale: 10,
+    scale: 0.25,
+    animations: buttonAnimation,
+  });
+  betPlusButton.textView!.style.fill = { color: "#ffffff" };
+  betPlusButton.anchor.set(0.5);
+  betPlusButton.onPress.connect(() => {
+    if (BET_AMOUNT + 5 > moneyManager.getBalance()) return;
+    BET_AMOUNT += 5;
+    console.log("New bet amount", BET_AMOUNT);
+  });
+  betPlusButton.x = 1180;
+  betPlusButton.y = 990;
+  betPlusButton.zIndex = 99;
+
+  const betMinusButton = new FancyButton({
+    defaultView: button,
+    pressedView: button_pressed,
+    text: "-",
+    defaultTextScale: 10,
+    scale: 0.25,
+    animations: buttonAnimation,
+  });
+  betMinusButton.textView!.style.fill = { color: "#ffffff" };
+  betMinusButton.anchor.set(0.5);
+  betMinusButton.onPress.connect(() => {
+    if (BET_AMOUNT <= 5) return;
+    BET_AMOUNT -= 5;
+    console.log("New bet amount", BET_AMOUNT);
+  });
+  betMinusButton.x = 930;
+  betMinusButton.y = 990;
+  betMinusButton.zIndex = 99;
+
+  const linesPlusButton = new FancyButton({
+    defaultView: button,
+    pressedView: button_pressed,
+    text: "+",
+    defaultTextScale: 10,
+    scale: 0.25,
+    animations: buttonAnimation,
+  });
+  linesPlusButton.textView!.style.fill = { color: "#ffffff" };
+  linesPlusButton.anchor.set(0.5);
+  linesPlusButton.onPress.connect(() => {
+    if (LINE_COUNT === 50) return;
+    LINE_COUNT += 10;
+    console.log("New line count", LINE_COUNT);
+  });
+  linesPlusButton.x = 340;
+  linesPlusButton.y = 990;
+  linesPlusButton.zIndex = 99;
+
+  const linesMinusButton = new FancyButton({
+    defaultView: button,
+    pressedView: button_pressed,
+    text: "-",
+    defaultTextScale: 10,
+    scale: 0.25,
+    animations: buttonAnimation,
+  });
+  linesMinusButton.textView!.style.fill = { color: "#ffffff" };
+  linesMinusButton.anchor.set(0.5);
+  linesMinusButton.onPress.connect(() => {
+    if (LINE_COUNT <= 10) return;
+    LINE_COUNT -= 10;
+    console.log("New line count", LINE_COUNT);
+  });
+  linesMinusButton.x = 110;
+  linesMinusButton.y = 990;
+  linesMinusButton.zIndex = 99;
+
   bottom.addChild(restartButton);
+  bottom.addChild(betPlusButton);
+  bottom.addChild(betMinusButton);
+  bottom.addChild(linesMinusButton);
+  bottom.addChild(linesPlusButton);
 
   // Create gradient fill
   const fill = new FillGradient(0, 0, 0, 36 * 1.7);
@@ -291,7 +372,7 @@ function reelsComplete() {
   );
 
   endSymbolUrls; // <- tutaj array z url symboli które się wylosowały
-  const lines = getLines(5, 4, 50);
+  const lines = getLines(5, 4, LINE_COUNT);
 
   currentHighlight = 0;
   let totalScore = 0;
