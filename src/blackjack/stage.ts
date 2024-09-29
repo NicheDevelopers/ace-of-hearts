@@ -6,7 +6,7 @@ const blackjackStage = new PIXI.Container();
 
 const game = new BlackjackGame(blackjackStage);
 
-import hubPath from "/slots/slots-hub.png";
+import hubPath from "/blackjack/blackjack-hub-labeled.png";
 
 await PIXI.Assets.load([hubPath]);
 
@@ -56,7 +56,7 @@ const drawButton = new FancyButton({
          }
      }
 });
-drawButton.position.set(1240, 990);
+drawButton.position.set(1340, 990);
 drawButton.onPress.connect(() => {
     if (game.finished) 
         return;
@@ -94,7 +94,7 @@ const passButton = new FancyButton({
          }
      }
 });
-passButton.position.set(1440, 990);
+passButton.position.set(1540, 990);
 passButton.onPress.connect(() => {
     if (game.finished) 
         return;
@@ -136,13 +136,88 @@ const restartButton = new FancyButton({
          }
      }
 });
-restartButton.position.set(1640, 990);
+restartButton.position.set(1740, 990);
 restartButton.onPress.connect(() => {
     console.log('Restarting game');
     game.restart();
 });
 restartButton.zIndex = 2;
 blackjackStage.addChild(restartButton);
+
+const plusBetButton = new FancyButton({
+    defaultView: button,
+    hoverView: button_pressed,
+    pressedView: button_pressed,
+    text: '+',
+    scale: 0.1,
+    animations: {
+         hover: {
+             props: {
+                 scale: {
+                     x: 1.1,
+                     y: 1.1,
+                 }
+             },
+             duration: 100,
+         },
+         pressed: {
+             props: {
+                 scale: {
+                     x: 0.9,
+                     y: 0.9,
+                 }
+             },
+             duration: 100,
+         }
+     }
+});
+plusBetButton.position.set(1190, 955);
+plusBetButton.onPress.connect(() => {
+    game.bet = Math.min(game.bet + game.deltaBet, game.maxBet);
+    betText.text = game.bet;
+});
+plusBetButton.zIndex = 2;
+blackjackStage.addChild(plusBetButton);
+
+const minusBetButton = new FancyButton({
+    defaultView: button,
+    hoverView: button_pressed,
+    pressedView: button_pressed,
+    text: '-',
+    scale: 0.1,
+    animations: {
+         hover: {
+             props: {
+                 scale: {
+                     x: 1.1,
+                     y: 1.1,
+                 }
+             },
+             duration: 100,
+         },
+         pressed: {
+             props: {
+                 scale: {
+                     x: 0.9,
+                     y: 0.9,
+                 }
+             },
+             duration: 100,
+         }
+     }
+});
+minusBetButton.position.set(1190, 1025);
+minusBetButton.onPress.connect(() => {
+    game.bet = Math.max(game.bet - game.deltaBet, game.minBet);
+    betText.text = game.bet;
+});
+minusBetButton.zIndex = 2;
+blackjackStage.addChild(minusBetButton);
+
+const betText = new PIXI.Text(`${game.bet}`, { fontSize: 60, fill: 0xFFFFFF });
+betText.position.set(1025, 960);
+betText.zIndex = 2;
+blackjackStage.addChild(betText);
 
 export default blackjackStage;
 

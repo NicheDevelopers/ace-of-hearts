@@ -14,6 +14,10 @@ export class BlackjackGame {
     dealerHand: BlackjackHand;
     turn: boolean = true;
     finished: boolean = false;
+    bet: number = 20;
+    deltaBet: number = 10;
+    minBet: number = 10;
+    maxBet: number = 90;
     constructor(blackjackStage: PIXI.Container<PIXI.ContainerChild>) {
         this.blackjackStage = blackjackStage;
         this.playerHand = new BlackjackHand(true, this.blackjackStage);
