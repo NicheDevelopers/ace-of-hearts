@@ -119,6 +119,7 @@ const VISIBLE_ROWS = 4; // Increase this value to show more rows
 const REELS_COUNT = 5;
 let LINE_COUNT = 50;
 let BET_AMOUNT = 25;
+let LAST_WIN = 0;
 
 // Create different slot symbols
 const slotTextures = CURRENT_GAME.getTextures();
@@ -126,6 +127,20 @@ const slotTextures = CURRENT_GAME.getTextures();
 // Build the reels
 const reels = [] as Reel[];
 const reelContainer = new Container();
+
+const winText = new PIXI.Text(`${LAST_WIN}`, {
+  fontSize: 60,
+  fill: 0xffffff,
+});
+winText.position.set(1350, 960);
+winText.zIndex = 2;
+
+const creditsText = new PIXI.Text(`${moneyManager.getBalance()}`, {
+  fontSize: 60,
+  fill: 0xffffff,
+});
+creditsText.position.set(590, 960);
+creditsText.zIndex = 2;
 
 function setupReels() {
   for (let i = 0; i < 5; i++) {
@@ -221,6 +236,13 @@ function setupReels() {
   restartButton.y = 980;
   restartButton.zIndex = 99;
 
+  const betText = new PIXI.Text(`${BET_AMOUNT}`, {
+    fontSize: 60,
+    fill: 0xffffff,
+  });
+  betText.position.set(1020, 960);
+  betText.zIndex = 2;
+
   const betPlusButton = new FancyButton({
     defaultView: button,
     pressedView: button_pressed,
@@ -234,6 +256,7 @@ function setupReels() {
   betPlusButton.onPress.connect(() => {
     if (BET_AMOUNT + 5 > moneyManager.getBalance()) return;
     BET_AMOUNT += 5;
+    betText.text = BET_AMOUNT;
     console.log("New bet amount", BET_AMOUNT);
   });
   betPlusButton.x = 1180;
@@ -253,11 +276,19 @@ function setupReels() {
   betMinusButton.onPress.connect(() => {
     if (BET_AMOUNT <= 5) return;
     BET_AMOUNT -= 5;
+    betText.text = BET_AMOUNT;
     console.log("New bet amount", BET_AMOUNT);
   });
   betMinusButton.x = 930;
   betMinusButton.y = 990;
   betMinusButton.zIndex = 99;
+
+  const linesText = new PIXI.Text(`${LINE_COUNT}`, {
+    fontSize: 60,
+    fill: 0xffffff,
+  });
+  linesText.position.set(190, 960);
+  linesText.zIndex = 2;
 
   const linesPlusButton = new FancyButton({
     defaultView: button,
@@ -272,6 +303,7 @@ function setupReels() {
   linesPlusButton.onPress.connect(() => {
     if (LINE_COUNT === 50) return;
     LINE_COUNT += 10;
+    linesText.text = LINE_COUNT;
     console.log("New line count", LINE_COUNT);
   });
   linesPlusButton.x = 340;
@@ -291,11 +323,17 @@ function setupReels() {
   linesMinusButton.onPress.connect(() => {
     if (LINE_COUNT <= 10) return;
     LINE_COUNT -= 10;
+    linesText.text = LINE_COUNT;
     console.log("New line count", LINE_COUNT);
   });
   linesMinusButton.x = 110;
   linesMinusButton.y = 990;
   linesMinusButton.zIndex = 99;
+
+  bottom.addChild(betText);
+  bottom.addChild(linesText);
+  bottom.addChild(winText);
+  bottom.addChild(creditsText);
 
   bottom.addChild(restartButton);
   bottom.addChild(betPlusButton);
@@ -339,6 +377,7 @@ function startPlay() {
   console.log("START PLAY");
   running = true;
   moneyManager.subtractMoney(BET_AMOUNT);
+  creditsText.text = moneyManager.getBalance();
   console.log("Betting ", BET_AMOUNT);
   console.log("Current balance ", moneyManager.formatBalance());
   endSymbolUrls = [];
@@ -386,13 +425,16 @@ function reelsComplete() {
     }
     const score = getLineScore(symbolsOnLine, CURRENT_GAME);
     totalScore += score;
+    winText.text = totalScore;
     if (score > 0) {
       console.log(line, symbolsOnLine, score);
       highlightedLines.push(getLineGraphics(line));
     }
   }
 
+  LAST_WIN = totalScore;
   moneyManager.addMoney(totalScore);
+  creditsText.text = moneyManager.getBalance();
   console.log("Won ", totalScore);
   console.log("Current balance: ", moneyManager.formatBalance());
 
