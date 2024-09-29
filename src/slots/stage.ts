@@ -115,6 +115,7 @@ import moneyManager from "../MoneyManager";
 import { FancyButton } from "@pixi/ui";
 import pixiPaytable from "./games/pixi";
 import { hearts } from "cards/build/suits";
+import wildWestPaytable from "./games/wildWest";
 
 function getLineGraphics(line: Line) {
   const lineGraphics = new Graphics();
@@ -136,7 +137,7 @@ function getLineGraphics(line: Line) {
   return lineGraphics;
 }
 
-const GAMES = [witcherPaytable, pixiPaytable];
+const GAMES = [witcherPaytable, pixiPaytable, wildWestPaytable];
 let CURRENT_GAME_IDX = 0;
 let CURRENT_GAME = GAMES[CURRENT_GAME_IDX];
 
