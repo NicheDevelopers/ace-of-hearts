@@ -6,9 +6,9 @@ const witcherEntries: PaytableEntry[] = [
   {
     isWildcard: false,
     streaks: {
-      3: 1,
-      4: 5,
-      5: 10,
+      3: 2,
+      4: 15,
+      5: 50,
     },
     rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-aard.png",
@@ -16,9 +16,9 @@ const witcherEntries: PaytableEntry[] = [
   {
     isWildcard: false,
     streaks: {
-      3: 1,
-      4: 5,
-      5: 10,
+      3: 2,
+      4: 15,
+      5: 50,
     },
     rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-igni.png",
@@ -26,9 +26,9 @@ const witcherEntries: PaytableEntry[] = [
   {
     isWildcard: false,
     streaks: {
-      3: 1,
-      4: 5,
-      5: 10,
+      3: 2,
+      4: 15,
+      5: 50,
     },
     rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-axii.png",
@@ -36,9 +36,9 @@ const witcherEntries: PaytableEntry[] = [
   {
     isWildcard: false,
     streaks: {
-      3: 1,
-      4: 5,
-      5: 10,
+      3: 2,
+      4: 15,
+      5: 50,
     },
     rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-quen.png",
@@ -46,9 +46,9 @@ const witcherEntries: PaytableEntry[] = [
   {
     isWildcard: false,
     streaks: {
-      3: 1,
-      4: 5,
-      5: 10,
+      3: 2,
+      4: 15,
+      5: 50,
     },
     rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-yrden.png",
@@ -56,9 +56,9 @@ const witcherEntries: PaytableEntry[] = [
   {
     isWildcard: true,
     streaks: {
-      3: 50,
-      4: 500,
-      5: 1000,
+      3: 250,
+      4: 1000,
+      5: 2500,
     },
     rarity: 3,
     textureUrl: "http://localhost:3000/slots/geralt.png",
@@ -66,29 +66,29 @@ const witcherEntries: PaytableEntry[] = [
   {
     isWildcard: false,
     streaks: {
-      3: 25,
-      4: 250,
-      5: 500,
+      3: 50,
+      4: 200,
+      5: 1000,
     },
     rarity: 2,
     textureUrl: "http://localhost:3000/slots/yennefer.png",
   },
+  // {
+  //   isWildcard: false,
+  //   streaks: {
+  //     3: 50,
+  //     4: 200,
+  //     5: 1000,
+  //   },
+  //   rarity: 2,
+  //   textureUrl: "http://localhost:3000/slots/zoltan.png",
+  // },
   {
     isWildcard: false,
     streaks: {
-      3: 25,
-      4: 250,
-      5: 500,
-    },
-    rarity: 2,
-    textureUrl: "http://localhost:3000/slots/zoltan.png",
-  },
-  {
-    isWildcard: false,
-    streaks: {
-      3: 25,
-      4: 250,
-      5: 500,
+      3: 50,
+      4: 200,
+      5: 1000,
     },
     rarity: 2,
     textureUrl: "http://localhost:3000/slots/triss.png",
