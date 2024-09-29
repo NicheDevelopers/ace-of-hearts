@@ -8,6 +8,7 @@ const witcherEntries: PaytableEntry[] = [
       4: 5,
       5: 10,
     },
+    rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-aard.png",
   },
   {
@@ -17,6 +18,7 @@ const witcherEntries: PaytableEntry[] = [
       4: 5,
       5: 10,
     },
+    rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-igni.png",
   },
   {
@@ -26,6 +28,7 @@ const witcherEntries: PaytableEntry[] = [
       4: 5,
       5: 10,
     },
+    rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-axii.png",
   },
   {
@@ -35,6 +38,7 @@ const witcherEntries: PaytableEntry[] = [
       4: 5,
       5: 10,
     },
+    rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-quen.png",
   },
   {
@@ -44,6 +48,7 @@ const witcherEntries: PaytableEntry[] = [
       4: 5,
       5: 10,
     },
+    rarity: 1,
     textureUrl: "http://localhost:3000/slots/witcher-yrden.png",
   },
   {
@@ -53,6 +58,7 @@ const witcherEntries: PaytableEntry[] = [
       4: 500,
       5: 1000,
     },
+    rarity: 3,
     textureUrl: "http://localhost:3000/slots/geralt.png",
   },
   {
@@ -62,6 +68,7 @@ const witcherEntries: PaytableEntry[] = [
       4: 250,
       5: 500,
     },
+    rarity: 2,
     textureUrl: "http://localhost:3000/slots/yennefer.png",
   },
   {
@@ -71,6 +78,7 @@ const witcherEntries: PaytableEntry[] = [
       4: 250,
       5: 500,
     },
+    rarity: 2,
     textureUrl: "http://localhost:3000/slots/zoltan.png",
   },
   {
@@ -80,6 +88,7 @@ const witcherEntries: PaytableEntry[] = [
       4: 250,
       5: 500,
     },
+    rarity: 2,
     textureUrl: "http://localhost:3000/slots/triss.png",
   },
 ];

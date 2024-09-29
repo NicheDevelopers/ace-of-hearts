@@ -2,8 +2,14 @@ import * as PIXI from "pixi.js";
 import slotsBorderPath from "/slots/slots-border.png";
 import slotsHubPath from "/slots/slots-hub-labeled.png";
 import backgroundPath from "/slots/bigwin-background.png";
+import witcherHorseshoePath from "/slots/witcher-background.png";
+import plasterPath from "/slots/wooden-plaster.png";
 
-await Assets.load([slotsBorderPath, slotsHubPath, backgroundPath]);
+await Assets.load([
+  slotsBorderPath, slotsHubPath,
+  backgroundPath, witcherHorseshoePath,
+  plasterPath,
+]);
 import button from "/button.png";
 import button_pressed from "/button_pressed.png";
 await PIXI.Assets.load([button, button_pressed]);
@@ -49,9 +55,27 @@ slotsHub.y = 1080;
 slotsHub.width = 1920;
 slotsHub.height = 180;
 
+const witcherTexture = PIXI.Texture.from(witcherHorseshoePath);
+const witcherHorseshoe = new PIXI.Sprite(witcherTexture);
+
+witcherHorseshoe.anchor.set(0, 0);
+witcherHorseshoe.x = 0;
+witcherHorseshoe.y = 0;
+witcherHorseshoe.width = 1920;
+witcherHorseshoe.height = 1080;
+
+const plasterTexture = PIXI.Texture.from(plasterPath);
+const plaster = new PIXI.Sprite(plasterTexture);
+
+plaster.anchor.set(0, 0);
+plaster.x = 450;
+plaster.y = 163;
+plaster.width = 1022;
+plaster.height = 17;
+
 interface Reel {
   container: Container;
-  symbols: OurSprite[];
+  symbols: Sprite[];
   position: number;
   previousPosition: number;
   blur: BlurFilter;
@@ -68,8 +92,6 @@ interface Tween {
   complete: any;
   start: any;
 }
-
-type OurSprite = Sprite & { symbolId: number };
 
 import {
   Assets,
@@ -121,9 +143,6 @@ let LINE_COUNT = 50;
 let BET_AMOUNT = 25;
 let LAST_WIN = 0;
 
-// Create different slot symbols
-const slotTextures = CURRENT_GAME.getTextures();
-
 // Build the reels
 const reels = [] as Reel[];
 const reelContainer = new Container();
@@ -165,10 +184,8 @@ function setupReels() {
 
     // Build the symbols
     for (let j = 0; j < VISIBLE_ROWS + 1; j++) {
-      const symbolId = Math.floor(Math.random() * slotTextures.length);
-      const symbol = new Sprite(slotTextures[symbolId]) as OurSprite;
-
-      symbol.symbolId = symbolId;
+      const id = CURRENT_GAME.getRandomTextureIndex();
+      const symbol = new Sprite(slotTextures[id]);
 
       symbol.y = j * SYMBOL_SIZE;
       symbol.scale.x = symbol.scale.y = Math.min(
@@ -184,40 +201,14 @@ function setupReels() {
   slotsStage.addChild(slotsBorder);
   // slotsHub is added later to be on the top
   slotsStage.addChild(reelContainer);
+  slotsStage.addChild(witcherHorseshoe);
+  slotsStage.addChild(plaster);
 
   // Adjust margins and positioning
   const margin = (app.screen.height - SYMBOL_SIZE * VISIBLE_ROWS) / 2;
 
   reelContainer.y = margin;
   reelContainer.x = Math.round((app.screen.width - REEL_WIDTH * 5) / 2 + 10);
-
-  // Create top header
-  const TOP_HEADER_HEIGHT = SYMBOL_SIZE; // Height of the top header
-  const topHeader = new Graphics()
-    .rect(0, 0, app.screen.width, margin)
-    .fill({ color: 0x0000ff }); // Black background
-
-  // Add header text
-  const headerStyle = new TextStyle({
-    fontFamily: "Arial",
-    fontSize: 36,
-    fontStyle: "italic",
-    fontWeight: "bold",
-    fill: 0xffffff, // White text
-    stroke: { color: 0x4a1850, width: 5 },
-    dropShadow: {
-      color: 0x000000,
-      angle: Math.PI / 6,
-      blur: 4,
-      distance: 6,
-    },
-  });
-
-  const headerText = new Text("Slot Machine", headerStyle);
-  headerText.x = Math.round((topHeader.width - headerText.width) / 2);
-  headerText.y = Math.round((TOP_HEADER_HEIGHT - headerText.height) / 2);
-
-  topHeader.addChild(headerText);
 
   const bottom = new Graphics()
     .rect(0, SYMBOL_SIZE * VISIBLE_ROWS + margin, app.screen.width, margin)
@@ -358,7 +349,6 @@ function setupReels() {
     fill.addColorStop(ratio, number);
   });
 
-  slotsStage.addChild(topHeader);
   slotsStage.addChild(slotsHub);
   slotsStage.addChild(bottom);
 
@@ -394,7 +384,7 @@ function startPlay() {
     const target = r.position + 10 + i * 2;
     const time = 500 + i * 200;
     tweenTo(r, "position", target, time, backout(0.05), null, () => {
-      const sortedReel = [...(r.symbols as OurSprite[])].sort(
+      const sortedReel = [...(r.symbols as Sprite[])].sort(
         (a, b) => a.y - b.y,
       );
       // delete the first element - the one hidden behind the header
@@ -425,14 +415,12 @@ function reelsComplete() {
   for (const line of lines) {
     let symbolsOnLine: string[] = [];
     for (let i = 0; i < REELS_COUNT; i++) {
-      console.log(line, i);
       symbolsOnLine.push(endSymbolUrls[i][line.heights[i]]);
     }
     const score = getLineScore(symbolsOnLine, CURRENT_GAME, LINE_COUNT, BET_AMOUNT);
     totalScore += score;
     winText.text = totalScore;
     if (score > 0) {
-      console.log(line, symbolsOnLine, score);
       highlightedLines.push(getLineGraphics(line));
     }
   }
@@ -450,6 +438,8 @@ function reelsComplete() {
 
 // index of the currently highlighted line from highlightedLines
 let currentHighlight = 0;
+
+const slotTextures = CURRENT_GAME.getTextures();
 
 function highlightLines() {
   if (running && !bigWinAnim || highlightedLines.length === 0) return;
@@ -480,8 +470,7 @@ app.ticker.add(() => {
 
       s.y = ((r.position + j) % r.symbols.length) * SYMBOL_SIZE - SYMBOL_SIZE;
       if (s.y < 0 && prevy > SYMBOL_SIZE * (VISIBLE_ROWS - 1)) {
-        s.texture =
-          slotTextures[Math.floor(Math.random() * slotTextures.length)];
+        s.texture = slotTextures[CURRENT_GAME.getRandomTextureIndex()];
         s.scale.x = s.scale.y = Math.min(
           SYMBOL_SIZE / s.texture.width,
           SYMBOL_SIZE / s.texture.height,
