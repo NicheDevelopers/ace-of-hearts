@@ -10,6 +10,7 @@ import slotsStage from './slots/stage.ts';
 import blackjackStage from './blackjack/stage.ts';
 
 import './MoneyManager';
+import { FancyButton } from '@pixi/ui';
 
 await PIXI.Assets.load([
   dziadu,
@@ -50,14 +51,49 @@ function switchScene() {
   console.log('current stage:', currentScene);
 }
 
-const button = new PIXI.Graphics();
-button.fill(0xff0000);
-button.rect(0, 0, 100, 50);
-button.fill();
-button.interactive = true;
-button.position.set(10, 10);
-app.stage.addChild(button);
-// Event listener for the button click
-button.on('pointerdown', switchScene);
+import button from '/button.png';
+import button_pressed from '/button_pressed.png';
+
+await PIXI.Assets.load([
+    button,
+    button_pressed,
+]);
+
+const buttonChangeState = new FancyButton({
+  defaultView: button,
+  hoverView: button_pressed,
+  pressedView: button_pressed,
+  text: 'Change scene',
+  defaultTextScale: 2,
+  scale: 0.3,
+  animations: {
+        hover: {
+            props: {
+                scale: {
+                    x: 1.1,
+                    y: 1.1,
+                }
+            },
+            duration: 100,
+        },
+        pressed: {
+            props: {
+                scale: {
+                    x: 0.9,
+                    y: 0.9,
+                }
+            },
+            duration: 100,
+        }
+    }
+})
+buttonChangeState.anchor.set(1, 0);
+buttonChangeState.position.set(1890, 30);
+buttonChangeState.zIndex = 50;
+buttonChangeState.onPress.connect(() => {
+  switchScene();
+});
+buttonChangeState.textView!.style.fill = 0xffffff;
+app.stage.addChild(buttonChangeState);
 
 switchScene();

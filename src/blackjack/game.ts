@@ -5,6 +5,7 @@ import { parseCardToString } from './parser';
 import app from '../app';
 import { CardImages } from './cardImages';
 import moneyManager from '../MoneyManager';
+import { CardValues, dealersAnswers, GameStates } from './util';
 
 await PIXI.Assets.load(Object.values(CardImages));
 
@@ -68,14 +69,13 @@ export class BlackjackGame {
             : this.dealerHand.draw(this.deck.draw(1));
         const state = this.getState();
         if (state !== GameStates.CONTINUE) {
-            this.blackjackReplay.text = state;
+            this.blackjackReplay.text =
+                    dealersAnswers[state][Math.floor(Math.random() * dealersAnswers[state].length)];
             if (state === GameStates.PLAYER_WIN || state === GameStates.DEALER_LOST) {
                 moneyManager.addMoney(this.currentBet * 2);
-                // TODO: Add dealer text to show - player win
             }
             if (state === GameStates.DRAW) {
                 moneyManager.addMoney(this.currentBet);
-                // TODO: Add dealer text to show - draw
             }
             if (state === GameStates.PLAYER_LOST || state === GameStates.DEALER_WIN) {
                 // TODO: Add dealer text to show - player lost
@@ -161,31 +161,6 @@ export class BlackjackGame {
     }
 }
 
-export enum GameStates {
-    CONTINUE = "Game goes on!",
-    PLAYER_WIN = "Player win!",
-    PLAYER_LOST = "Player lost!",
-    DEALER_WIN = "dealer win!",
-    DEALER_LOST = "dealer lost!",
-    DRAW = "Draw!",
-}
-
-export const CardValues = {
-    "A": 11,
-    "K": 10,
-    "Q": 10,
-    "J": 10,
-    "10": 10,
-    "9": 9,
-    "8": 8,
-    "7": 7,
-    "6": 6,
-    "5": 5,
-    "4": 4,
-    "3": 3,
-    "2": 2,
-} as Record<string, number>;
-
 export class BlackjackHand {
     blackjackStage: PIXI.Container<PIXI.ContainerChild>;
     isPlayer: boolean;
@@ -214,7 +189,7 @@ export class BlackjackHand {
             if (this.score > 21) {
                 let aces = this.hand.filter((card) => card.rank.abbrn === 'A').length;
                 let bestScore = this.score;
-                while (this.score > 21 && aces > 0) {
+                while (bestScore > 21 && aces > 0) {
                     bestScore -= 10;
                     aces--;
                 }
