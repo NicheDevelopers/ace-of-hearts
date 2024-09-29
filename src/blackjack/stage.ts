@@ -34,7 +34,8 @@ const drawButton = new FancyButton({
     hoverView: button_pressed,
     pressedView: button_pressed,
     text: 'Draw',
-    scale: 0.1,
+    defaultTextScale: 2,
+    scale: 0.3,
     animations: {
          hover: {
              props: {
@@ -56,7 +57,8 @@ const drawButton = new FancyButton({
          }
      }
 });
-drawButton.position.set(1340, 990);
+drawButton.position.set(1340, 960);
+drawButton.zIndex = 2;
 drawButton.onPress.connect(() => {
     if (game.finished) 
         return;
@@ -64,7 +66,7 @@ drawButton.onPress.connect(() => {
     if (game.getState() !== GameStates.CONTINUE) 
         console.log(game.getState());
 });
-drawButton.zIndex = 2;
+drawButton.textView!.style.fill = 0xffffff;
 blackjackStage.addChild(drawButton);
 
 const passButton = new FancyButton({
@@ -72,7 +74,8 @@ const passButton = new FancyButton({
     hoverView: button_pressed,
     pressedView: button_pressed,
     text: 'Pass',
-    scale: 0.1,
+    defaultTextScale: 2,
+    scale: 0.3,
     animations: {
          hover: {
              props: {
@@ -94,7 +97,8 @@ const passButton = new FancyButton({
          }
      }
 });
-passButton.position.set(1540, 990);
+passButton.position.set(1540, 960);
+passButton.zIndex = 2;
 passButton.onPress.connect(() => {
     if (game.finished) 
         return;
@@ -106,7 +110,7 @@ passButton.onPress.connect(() => {
     }
     console.log('Game state after dealer moves:', game.getState());
 });
-passButton.zIndex = 2;
+passButton.textView!.style.fill = 0xffffff;
 blackjackStage.addChild(passButton);
 
 const restartButton = new FancyButton({
@@ -114,7 +118,8 @@ const restartButton = new FancyButton({
     hoverView: button_pressed,
     pressedView: button_pressed,
     text: 'Restart',
-    scale: 0.1,
+    defaultTextScale: 2,
+    scale: 0.3,
     animations: {
          hover: {
              props: {
@@ -136,19 +141,22 @@ const restartButton = new FancyButton({
          }
      }
 });
-restartButton.position.set(1740, 990);
+restartButton.position.set(1740, 960);
+restartButton.zIndex = 2;
 restartButton.onPress.connect(() => {
     console.log('Restarting game');
     game.restart();
 });
-restartButton.zIndex = 2;
+restartButton.textView!.style.fill = 0xffffff;
 blackjackStage.addChild(restartButton);
+
 
 const plusBetButton = new FancyButton({
     defaultView: button,
     hoverView: button_pressed,
     pressedView: button_pressed,
     text: '+',
+    defaultTextScale: 15,
     scale: 0.1,
     animations: {
          hover: {
@@ -177,6 +185,7 @@ plusBetButton.onPress.connect(() => {
     betText.text = game.bet;
 });
 plusBetButton.zIndex = 2;
+plusBetButton.textView!.style.fill = 0xffffff;
 blackjackStage.addChild(plusBetButton);
 
 const minusBetButton = new FancyButton({
@@ -184,6 +193,7 @@ const minusBetButton = new FancyButton({
     hoverView: button_pressed,
     pressedView: button_pressed,
     text: '-',
+    defaultTextScale: 15,
     scale: 0.1,
     animations: {
          hover: {
@@ -212,6 +222,7 @@ minusBetButton.onPress.connect(() => {
     betText.text = game.bet;
 });
 minusBetButton.zIndex = 2;
+minusBetButton.textView!.style.fill = 0xffffff;
 blackjackStage.addChild(minusBetButton);
 
 const betText = new PIXI.Text(`${game.bet}`, { fontSize: 60, fill: 0xFFFFFF });
