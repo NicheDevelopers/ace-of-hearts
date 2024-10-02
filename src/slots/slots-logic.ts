@@ -25,18 +25,18 @@ function isSymmetrical(a: number[]) {
   return a.every((e, i) => e === mirrorElem(a, i));
 }
 
-function longestStreak(l: number[]): number {
-  let longest = -Infinity;
-  let current = 1;
-  for (let i = 0; i < l.length; ++i) {
-    if (l[i] === l[i - 1]) current += 1;
-    else {
-      if (current > longest) longest = current;
-      current = 1;
-    }
-  }
-  return Math.max(longest, current);
-}
+// function longestStreak(l: number[]): number {
+//   let longest = -Infinity;
+//   let current = 1;
+//   for (let i = 0; i < l.length; ++i) {
+//     if (l[i] === l[i - 1]) current += 1;
+//     else {
+//       if (current > longest) longest = current;
+//       current = 1;
+//     }
+//   }
+//   return Math.max(longest, current);
+// }
 
 function streaks(l: number[], height: number): number[] {
   const longest = Array(height).fill(0);

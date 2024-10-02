@@ -1,4 +1,4 @@
-import { Paytable, PaytableEntry } from "./Paytable";
+import { Paytable } from "./Paytable";
 
 export function getLineScore(symbols: string[], paytable: Paytable, lineCount: number, bet_amount: number): number {
   let maxScore = 0;

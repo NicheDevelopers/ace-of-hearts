@@ -2,6 +2,16 @@ import { Assets } from "pixi.js";
 import { Paytable, PaytableEntry } from "../Paytable";
 import witcherHorseshoePath from "/slots/witcher-background.png";
 
+import aardPath from "/slots/witcher-aard.png";
+import igniPath from "/slots/witcher-igni.png";
+import axiiPath from "/slots/witcher-axii.png";
+import quenPath from "/slots/witcher-quen.png";
+import yrdenPath from "/slots/witcher-yrden.png";
+import geraltPath from "/slots/geralt.png";
+import yenneferPath from "/slots/yennefer.png";
+// import zoltanPath from "/slots/zoltan.png";
+import trissPath from "/slots/triss.png";
+
 const witcherEntries: PaytableEntry[] = [
   {
     isWildcard: false,
@@ -11,7 +21,7 @@ const witcherEntries: PaytableEntry[] = [
       5: 50,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/witcher-aard.png",
+    textureUrl: aardPath,
   },
   {
     isWildcard: false,
@@ -21,7 +31,7 @@ const witcherEntries: PaytableEntry[] = [
       5: 50,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/witcher-igni.png",
+    textureUrl: igniPath,
   },
   {
     isWildcard: false,
@@ -31,7 +41,7 @@ const witcherEntries: PaytableEntry[] = [
       5: 50,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/witcher-axii.png",
+    textureUrl: axiiPath,
   },
   {
     isWildcard: false,
@@ -41,7 +51,7 @@ const witcherEntries: PaytableEntry[] = [
       5: 50,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/witcher-quen.png",
+    textureUrl: quenPath,
   },
   {
     isWildcard: false,
@@ -51,7 +61,7 @@ const witcherEntries: PaytableEntry[] = [
       5: 50,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/witcher-yrden.png",
+    textureUrl: yrdenPath,
   },
   {
     isWildcard: true,
@@ -61,7 +71,7 @@ const witcherEntries: PaytableEntry[] = [
       5: 2500,
     },
     rarity: 3,
-    textureUrl: "http://localhost:3000/slots/geralt.png",
+    textureUrl: geraltPath,
   },
   {
     isWildcard: false,
@@ -71,7 +81,7 @@ const witcherEntries: PaytableEntry[] = [
       5: 1000,
     },
     rarity: 2,
-    textureUrl: "http://localhost:3000/slots/yennefer.png",
+    textureUrl: yenneferPath,
   },
   // {
   //   isWildcard: false,
@@ -81,7 +91,7 @@ const witcherEntries: PaytableEntry[] = [
   //     5: 1000,
   //   },
   //   rarity: 2,
-  //   textureUrl: "http://localhost:3000/slots/zoltan.png",
+  //   textureUrl: zoltanPath
   // },
   {
     isWildcard: false,
@@ -91,12 +101,15 @@ const witcherEntries: PaytableEntry[] = [
       5: 1000,
     },
     rarity: 2,
-    textureUrl: "http://localhost:3000/slots/triss.png",
+    textureUrl: trissPath
   },
 ];
 
-await Assets.load(witcherHorseshoePath);
-const witcherPaytable = new Paytable(witcherEntries, witcherHorseshoePath);
-await witcherPaytable.init();
+async function getWitcherPaytable() {
+  await Assets.load(witcherHorseshoePath);
+  const witcherPaytable = new Paytable(witcherEntries, witcherHorseshoePath);
+  await witcherPaytable.init();
+  return witcherPaytable;
+}
 
-export default witcherPaytable;
+export default getWitcherPaytable;

@@ -38,7 +38,15 @@ export class Paytable {
     return this.symbols.map((s) => Texture.from(s.textureUrl));
   }
   getEntryByUrl(url: string): PaytableEntry {
-    return this.symbols.find((s) => s.textureUrl === url)!;
+    // remove the protocol from the url
+    url = url.replace(/.*:\/\//, '');
+    // remove the origin from the url
+    url = url.replace(/.*?\//, '/');
+    const entry = this.symbols.find((s) => s.textureUrl === url);
+    if (!entry) {
+      throw new Error(`Entry with url ${url} not found. Possible entries: ${this.symbols.map(s => s.textureUrl).join(', ')}`);
+    }
+    return entry;
   }
   getRandomTextureIndex() {
     const raritySum = this.symbols.reduce(
