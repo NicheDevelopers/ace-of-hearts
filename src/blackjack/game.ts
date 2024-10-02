@@ -2,12 +2,9 @@ import { StandardDeck } from 'cards/build/decks/standard';
 import { Card, decks } from 'cards';
 import * as PIXI from 'pixi.js';
 import { parseCardToString } from './parser';
-import app from '../app';
 import { CardImages } from './cardImages';
-import moneyManager from '../MoneyManager';
+import MoneyManager from '../MoneyManager';
 import { CardValues, dealersAnswers, GameStates } from './util';
-
-await PIXI.Assets.load(Object.values(CardImages));
 
 export class BlackjackGame {
     blackjackStage: PIXI.Container<PIXI.ContainerChild>;
@@ -24,29 +21,35 @@ export class BlackjackGame {
     blackjackReplay: PIXI.Text;
     playerScore: PIXI.Text;
     dealerScore: PIXI.Text;
+    app: PIXI.Application;
+    moneyManager: MoneyManager;
     constructor(
         blackjackStage: PIXI.Container<PIXI.ContainerChild>, 
         blackjackReplay: PIXI.Text,
         dealerScore: PIXI.Text,
-        playerScore: PIXI.Text
+        playerScore: PIXI.Text,
+        app: PIXI.Application,
+        moneyManager: MoneyManager,
     ) {
         this.blackjackStage = blackjackStage;
         this.playerScore = playerScore;
         this.dealerScore = dealerScore;
-        this.playerHand = new BlackjackHand(true, this.blackjackStage, this.playerScore);
-        this.dealerHand = new BlackjackHand(false, this.blackjackStage, this.dealerScore);
+        this.playerHand = new BlackjackHand(true, this.blackjackStage, this.playerScore, app);
+        this.dealerHand = new BlackjackHand(false, this.blackjackStage, this.dealerScore, app);
         this.blackjackReplay = blackjackReplay;
+        this.app = app;
+        this.moneyManager = moneyManager;
     }
 
     restart() {
-        moneyManager.subtractMoney(this.bet);
+        this.moneyManager.subtractMoney(this.bet);
         this.currentBet = this.bet;
         this.blackjackStage.removeChild(...this.playerHand.cardsImg);
         this.blackjackStage.removeChild(...this.dealerHand.cardsImg);
         this.deck = new decks.StandardDeck({ jokers: 0 });
         this.deck.shuffleAll();
-        this.playerHand = new BlackjackHand(true, this.blackjackStage, this.playerScore);
-        this.dealerHand = new BlackjackHand(false, this.blackjackStage, this.dealerScore);
+        this.playerHand = new BlackjackHand(true, this.blackjackStage, this.playerScore, this.app);
+        this.dealerHand = new BlackjackHand(false, this.blackjackStage, this.dealerScore, this.app);
         this.turn = true;
         this.playerHand.draw(this.deck.draw(2));
         this.dealerHand.draw(this.deck.draw(2));
@@ -72,10 +75,10 @@ export class BlackjackGame {
             this.blackjackReplay.text =
                     dealersAnswers[state][Math.floor(Math.random() * dealersAnswers[state].length)];
             if (state === GameStates.PLAYER_WIN || state === GameStates.DEALER_LOST) {
-                moneyManager.addMoney(this.currentBet * 2);
+                this.moneyManager.addMoney(this.currentBet * 2);
             }
             if (state === GameStates.DRAW) {
-                moneyManager.addMoney(this.currentBet);
+                this.moneyManager.addMoney(this.currentBet);
             }
             if (state === GameStates.PLAYER_LOST || state === GameStates.DEALER_WIN) {
                 // TODO: Add dealer text to show - player lost
@@ -98,7 +101,7 @@ export class BlackjackGame {
                 removeDownCard();
         }
         const removeDownCard = () => {
-            app.ticker.remove(downCardStart);
+            this.app.ticker.remove(downCardStart);
         }
         const upCardStart = () => {
             sprite.y -= 2;
@@ -106,14 +109,11 @@ export class BlackjackGame {
                 removeUpCard();
         }
         const removeUpCard = async () => {
-            app.ticker.remove(upCardStart);
+            this.app.ticker.remove(upCardStart);
             sprite.texture = PIXI.Texture.from(CardImages[parseCardToString(this.dealerHand.hand[0], false)]);
-            //await new Promise((resolve) => {
-            //    setTimeout(resolve, 500);
-            //})
-            app.ticker.add(downCardStart);
+            this.app.ticker.add(downCardStart);
         }
-        app.ticker.add(upCardStart);
+        this.app.ticker.add(upCardStart);
     }
 
     getState(): GameStates {
@@ -168,10 +168,12 @@ export class BlackjackHand {
     score: number;
     cardsImg: PIXI.Sprite[];
     scoreText: PIXI.Text;
+    app: PIXI.Application;
     constructor(
         isPlayer: boolean, 
         blackjackStage: PIXI.Container<PIXI.ContainerChild>,
-        scoreText: PIXI.Text
+        scoreText: PIXI.Text,
+        app: PIXI.Application,
     ) {
         this.blackjackStage = blackjackStage;
         this.hand = [];
@@ -179,6 +181,7 @@ export class BlackjackHand {
         this.isPlayer = isPlayer;
         this.cardsImg = [];
         this.scoreText = scoreText;
+        this.app = app;
     }
 
     draw(cards: Card[]){
@@ -207,23 +210,23 @@ export class BlackjackHand {
             const offsetX = 60 * this.countCards() + Math.random() * 5;
             const offsetY = 100;
             if (!this.isPlayer) {
-                sprite.x = app.screen.width / 1.75 + offsetX;
-                sprite.y = app.screen.height / 4 + offsetY;
+                sprite.x = this.app.screen.width / 1.75 + offsetX;
+                sprite.y = this.app.screen.height / 4 + offsetY;
             }
             else {
-                sprite.x = app.screen.width / 1.75 + offsetX;
-                sprite.y = app.screen.height / 1.4 + offsetY;
+                sprite.x = this.app.screen.width / 1.75 + offsetX;
+                sprite.y = this.app.screen.height / 1.4 + offsetY;
             }
             this.blackjackStage.addChild(sprite);
             const fnTicker = () => {
                 sprite.y -= 2;
-                if (sprite.y <= ((this.isPlayer) ? app.screen.height / 1.4 : app.screen.height / 4))
+                if (sprite.y <= ((this.isPlayer) ? this.app.screen.height / 1.4 : this.app.screen.height / 4))
                     removeTicker();
             }
             const removeTicker = () => {
-                app.ticker.remove(fnTicker);
+                this.app.ticker.remove(fnTicker);
             }
-            app.ticker.add(fnTicker);
+            this.app.ticker.add(fnTicker);
             this.cardsImg.push(sprite);
         })
     }

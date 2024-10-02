@@ -1,16 +1,18 @@
 import * as PIXI from "pixi.js";
-import app from "./app";
+import money from '/money.png';
 
 class MoneyManager {
   private balance: number;
   private balanceText: PIXI.Text;
   private moneyIcon: PIXI.Sprite | null = null;
+  app: PIXI.Application;
 
-  constructor(initialBalance: number) {
+  constructor(initialBalance: number, app: PIXI.Application) {
     this.balance = initialBalance;
+    this.app = app;
 
     // Load the money icon
-    PIXI.Assets.load("/money.png").then((texture) => {
+    PIXI.Assets.load(money).then((texture) => {
       this.moneyIcon = new PIXI.Sprite(texture);
       this.moneyIcon.width = 48; // Match the font size
       this.moneyIcon.height = 48;
@@ -36,7 +38,7 @@ class MoneyManager {
   }
 
   private updatePositions(): void {
-    const rightEdge = app.screen.width - 10; // 10 pixels from the right edge
+    const rightEdge = this.app.screen.width - 10; // 10 pixels from the right edge
 
     if (this.moneyIcon) {
       this.moneyIcon.position.set(rightEdge - 10, 50);
@@ -80,6 +82,9 @@ class MoneyManager {
   }
 }
 
-const moneyManager = new MoneyManager(1000);
+async function getMoneyManager(app: PIXI.Application) {
+  return new MoneyManager(1000, app);
+}
 
-export default moneyManager;
+export { getMoneyManager };
+export default MoneyManager;

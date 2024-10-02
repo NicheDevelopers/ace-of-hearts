@@ -1,6 +1,14 @@
 import { Assets } from "pixi.js";
 import { Paytable, PaytableEntry } from "../Paytable";
 import wildWestHorseShoePath from "/slots/ww-horseshoe.png";
+import wildWestCactusPath from "/slots/ww-cactus.png";
+import wildWestSkullPath from "/slots/ww-skull.png";
+import wildWestTrainPath from "/slots/ww-train.png";
+import wildWestSheriffPath from "/slots/ww-sheriff.png";
+import wildWestClintPath from "/slots/ww-clint.png";
+import wildWestDynamitePath from "/slots/ww-dynamite.png";
+import wildWestColtPath from "/slots/ww-colt.png";
+import wildWestGoldPath from "/slots/ww-gold.png";
 
 const entries: PaytableEntry[] = [
   {
@@ -11,7 +19,7 @@ const entries: PaytableEntry[] = [
       5: 10,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/ww-cactus.png",
+    textureUrl: wildWestCactusPath,
   },
   {
     isWildcard: false,
@@ -21,7 +29,7 @@ const entries: PaytableEntry[] = [
       5: 10,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/ww-skull.png",
+    textureUrl: wildWestSkullPath,
   },
   {
     isWildcard: false,
@@ -31,7 +39,7 @@ const entries: PaytableEntry[] = [
       5: 10,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/ww-train.png",
+    textureUrl: wildWestTrainPath,
   },
   {
     isWildcard: false,
@@ -41,7 +49,7 @@ const entries: PaytableEntry[] = [
       5: 10,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/ww-cactus.png",
+    textureUrl: wildWestSheriffPath,
   },
   {
     isWildcard: false,
@@ -51,7 +59,7 @@ const entries: PaytableEntry[] = [
       5: 10,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/ww-sheriff.png",
+    textureUrl: wildWestSheriffPath
   },
   {
     isWildcard: true,
@@ -61,7 +69,7 @@ const entries: PaytableEntry[] = [
       5: 1000,
     },
     rarity: 3,
-    textureUrl: "http://localhost:3000/slots/ww-clint.png",
+    textureUrl: wildWestClintPath,
   },
   {
     isWildcard: false,
@@ -71,7 +79,7 @@ const entries: PaytableEntry[] = [
       5: 500,
     },
     rarity: 2,
-    textureUrl: "http://localhost:3000/slots/ww-dynamite.png",
+    textureUrl: wildWestDynamitePath
   },
   {
     isWildcard: false,
@@ -81,7 +89,7 @@ const entries: PaytableEntry[] = [
       5: 500,
     },
     rarity: 2,
-    textureUrl: "http://localhost:3000/slots/ww-colt.png",
+    textureUrl: wildWestColtPath,
   },
   {
     isWildcard: false,
@@ -91,12 +99,15 @@ const entries: PaytableEntry[] = [
       5: 500,
     },
     rarity: 2,
-    textureUrl: "http://localhost:3000/slots/ww-gold.png",
+    textureUrl: wildWestGoldPath,
   },
 ];
 
-await Assets.load(wildWestHorseShoePath);
-const wildWestPaytable = new Paytable(entries, wildWestHorseShoePath);
-await wildWestPaytable.init();
+async function getWildWestPaytable() {
+  await Assets.load(wildWestHorseShoePath);
+  const wildWestPaytable = new Paytable(entries, wildWestHorseShoePath);
+  await wildWestPaytable.init();
+  return wildWestPaytable;
+}
 
-export default wildWestPaytable;
+export default getWildWestPaytable;

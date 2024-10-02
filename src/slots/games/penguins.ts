@@ -2,6 +2,16 @@ import { Assets } from "pixi.js";
 import { Paytable, PaytableEntry } from "../Paytable";
 import wildWestHorseShoePath from "/slots/pom-horseshoe.png";
 
+import privatePath from "/slots/pom-private.png";
+import skipper from "/slots/pom-skipper.png";
+import kowalski from "/slots/pom-kowalski.png";
+import rico from "/slots/pom-rico.png";
+import marlene from "/slots/pom-marlene.png";
+import julian from "/slots/pom-julian.png";
+import mort from "/slots/pom-mort.png";
+import morris from "/slots/pom-morris.png";
+import alice from "/slots/pom-alice.png";
+
 const entries: PaytableEntry[] = [
   {
     isWildcard: false,
@@ -11,7 +21,7 @@ const entries: PaytableEntry[] = [
       5: 10,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/pom-private.png",
+    textureUrl: privatePath,
   },
   {
     isWildcard: false,
@@ -21,7 +31,7 @@ const entries: PaytableEntry[] = [
       5: 10,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/pom-skipper.png",
+    textureUrl: skipper,
   },
   {
     isWildcard: false,
@@ -31,7 +41,7 @@ const entries: PaytableEntry[] = [
       5: 10,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/pom-kowalski.png",
+    textureUrl: kowalski,
   },
   {
     isWildcard: false,
@@ -41,7 +51,7 @@ const entries: PaytableEntry[] = [
       5: 10,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/pom-rico.png",
+    textureUrl: rico,
   },
   {
     isWildcard: false,
@@ -51,7 +61,7 @@ const entries: PaytableEntry[] = [
       5: 10,
     },
     rarity: 1,
-    textureUrl: "http://localhost:3000/slots/pom-marlene.png",
+    textureUrl: marlene,
   },
   {
     isWildcard: true,
@@ -61,7 +71,7 @@ const entries: PaytableEntry[] = [
       5: 1000,
     },
     rarity: 3,
-    textureUrl: "http://localhost:3000/slots/pom-julian.png",
+    textureUrl: julian,
   },
   {
     isWildcard: false,
@@ -71,7 +81,7 @@ const entries: PaytableEntry[] = [
       5: 500,
     },
     rarity: 2,
-    textureUrl: "http://localhost:3000/slots/pom-mort.png",
+    textureUrl: mort,
   },
   {
     isWildcard: false,
@@ -81,7 +91,7 @@ const entries: PaytableEntry[] = [
       5: 500,
     },
     rarity: 2,
-    textureUrl: "http://localhost:3000/slots/pom-morris.png",
+    textureUrl: morris,
   },
   {
     isWildcard: false,
@@ -91,12 +101,15 @@ const entries: PaytableEntry[] = [
       5: 500,
     },
     rarity: 2,
-    textureUrl: "http://localhost:3000/slots/pom-alice.png",
+    textureUrl: alice,
   },
 ];
 
-await Assets.load(wildWestHorseShoePath);
-const penguinsPaytable = new Paytable(entries, wildWestHorseShoePath);
-await penguinsPaytable.init();
+async function getPenguinsPaytable() {
+  await Assets.load(wildWestHorseShoePath);
+  const penguinsPaytable = new Paytable(entries, wildWestHorseShoePath);
+  await penguinsPaytable.init();
+  return penguinsPaytable;
+}
 
-export default penguinsPaytable;
+export default getPenguinsPaytable;

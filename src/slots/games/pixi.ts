@@ -2,6 +2,11 @@ import { Assets } from "pixi.js";
 import { Paytable, PaytableEntry } from "../Paytable";
 import pixiHorseshoePath from "/slots/pixi-background.png";
 
+import eggHead from "/slots/eggHead.png";
+import flowerTop from "/slots/flowerTop.png";
+import helmlok from "/slots/helmlok.png";
+import skully from "/slots/skully.png";
+
 const pixiEntries: PaytableEntry[] = [
   {
     isWildcard: false,
@@ -11,7 +16,7 @@ const pixiEntries: PaytableEntry[] = [
       5: 100,
     },
     rarity: 1,
-    textureUrl: "https://pixijs.com/assets/eggHead.png",
+    textureUrl: eggHead,
   },
   {
     isWildcard: false,
@@ -21,7 +26,7 @@ const pixiEntries: PaytableEntry[] = [
       5: 15,
     },
     rarity: 1,
-    textureUrl: "https://pixijs.com/assets/flowerTop.png",
+    textureUrl: flowerTop,
   },
   {
     isWildcard: false,
@@ -31,7 +36,7 @@ const pixiEntries: PaytableEntry[] = [
       5: 200,
     },
     rarity: 1,
-    textureUrl: "https://pixijs.com/assets/helmlok.png",
+    textureUrl: helmlok,
   },
   {
     isWildcard: false,
@@ -41,13 +46,15 @@ const pixiEntries: PaytableEntry[] = [
       5: 1000,
     },
     rarity: 1,
-    textureUrl: "https://pixijs.com/assets/skully.png",
+    textureUrl: skully,
   },
 ];
-await Assets.load(pixiHorseshoePath);
-const pixiPaytable = new Paytable(pixiEntries, pixiHorseshoePath);
-console.log("pixi init");
-await pixiPaytable.init();
-console.log("done pixi init");
 
-export default pixiPaytable;
+async function getPixiPaytable() {
+  await Assets.load(pixiHorseshoePath);
+  const pixiPaytable = new Paytable(pixiEntries, pixiHorseshoePath);
+  await pixiPaytable.init();
+  return pixiPaytable;
+}
+
+export default getPixiPaytable;
